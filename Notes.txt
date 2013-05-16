@@ -1,0 +1,24 @@
+Assingment 3:
+hack-o-matic might be worth a look
+
+Playing a game like Hack, or Rouge
+
+
+80x80
+
+Heuristic to take into account if I have tool
+
+Minimum path distance
+
+Get d and a while building enviroment
+
+Only use dynamite once
+
+How do I know if path was blocked?
+
+
+
+Making a map:
+    The incoming data is printed onto the map every time a forward move is made
+    or something is blown up/chopped
+
