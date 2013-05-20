@@ -1,11 +1,11 @@
 /*********************************************
-/*  Agent.java
-/*  Agent for Text-Based Adventure Game
- *  John Aiden Rohde (z3343276)
- *  Sam Basset (z3372468)
-/*  COMP3411 Artificial Intelligence
-/*  UNSW Session 1, 2013
- */
+ *  Agent.java                               *
+ *  Agent for Text-Based Adventure Game      *
+ *  John Aiden Rohde (z3343276)              *
+ *  Sam Basset (z3372468)                    *
+ *  COMP3411 Artificial Intelligence         *
+ *  UNSW Session 1, 2013                     *
+ *********************************************/
 
 
 import java.util.*;
@@ -41,9 +41,11 @@ public class Agent {
       // REPLACE THIS CODE WITH AI TO CHOOSE ACTION
 
       int ch=0;
+      System.out.println("Row="+row);
+      System.out.println("Col="+col);
 
       System.out.print("Enter Action(s): ");
-
+      /*
       try {
          while ( ch != -1 ) {
             // read character from keyboard
@@ -59,9 +61,65 @@ public class Agent {
 
       catch (IOException e) {
          System.out.println ("IO error:" + e );
-      }
+      }*/
+      return walkAround();
 
-      return 0;
+
+   }
+
+   /* A* with limited visibility. To execute, need a couple of data structures:
+    * OPEN list can be represented as a Priority Queue
+    * CLOSED list could be a HashMap (to maybe speed up checking) or simple Vector
+    */
+
+   /* The hard part here is choosing a good heuristic, especially since most of the
+    * map won't be immediately visible. Maybe prioritise exploration unless a tool
+    * is easily reachable or an obstacle is surmountable. Wrong usage of dynamite is
+    * especially fatal to getting a good solution.
+    *
+    * If nothing obvious available, continue on current path until an obstacle is encountered. 
+    * Then turn and continue straight. 
+    */
+
+   // walk around, remembering as much as possible of the map.
+   private char walkAround() {
+      // if next tile is walkable, walk forward.
+      if (isWalkable(getNextTile())) {
+         return 'F';
+      } else {
+         return 'R';
+      }
+   }
+
+   private char getNextTile() {
+      char next = '~'; // assume unsafe unless otherwise known
+      int d_row = 0; int d_col = 0;
+      int nextRow = 0; int nextCol = 0;
+      switch( dirn ) {
+         case NORTH: 
+            d_row = -1; break;
+         case SOUTH: 
+            d_row =  1; break;
+         case EAST:  
+            d_col =  1; break;
+         case WEST:  
+            d_col = -1; break;
+         }
+         nextRow = row + d_row;
+         nextCol = col + d_col;
+         //ch is the object in front of us
+         next = map[nextRow][nextCol];
+
+      return next;
+   }
+
+   private boolean isWalkable(char tile) {
+      switch(tile) {
+      case '*': case 'T': case '-': case '~':
+         return false;
+      default:
+         return true;
+      }
    }
 
    void print_view(char view[][] )
@@ -83,6 +141,10 @@ public class Agent {
       }
       System.out.println("+-----+");
    }
+   /****************************************************************
+    * DISCLAIMER: update_world and update_map are inspired in part *
+    * by code supplied in Rogue.java                               *
+    ****************************************************************/
 
    //Update the world view based on the previous action taken
    private boolean update_world( char action, char view[][] ){
@@ -96,7 +158,7 @@ public class Agent {
          return( true );
       }
 
-      // make changes to direction only, not map, if dir'n changed
+      // make changes to direction only if dir'n changed
       if (( action == 'L' )||( action == 'l' )) {
          dirn = ( dirn + 1 ) % 4;
          return( true );
@@ -107,10 +169,14 @@ public class Agent {
          // if direction not changed, look ahead 1 space to see what's there
          d_row = 0; d_col = 0;
          switch( dirn ) {
-         case NORTH: d_row = -1; break;
-         case SOUTH: d_row =  1; break;
-         case EAST:  d_col =  1; break;
-         case WEST:  d_col = -1; break;
+         case NORTH: 
+            d_row = -1; break;
+         case SOUTH: 
+            d_row =  1; break;
+         case EAST:  
+            d_col =  1; break;
+         case WEST:  
+            d_col = -1; break;
          }
          new_row = row + d_row;
          new_col = col + d_col;
@@ -121,8 +187,8 @@ public class Agent {
       // if no direction changes to be made:
       switch( action ) {
       case 'F': case 'f': // forward
-         switch( ch ) {   // can't move into an obstacle
-         case '*': case 'T': case '-':
+         switch( ch ) {   // can't move into an obstacle or water
+         case '*': case 'T': case '-': case '~':
             return( false );
          }
          map[row][col] = ' '; // clear current location
@@ -169,6 +235,11 @@ public class Agent {
 
       //Initialize the map
       map = new char[200][200];
+      for (int i = 0; i < 200; i++) {
+         for (int j = 0 ;j < 200; j++) {
+            map[i][j] = 'X';
+         }
+      }
       update_map( view  );
    }
 
