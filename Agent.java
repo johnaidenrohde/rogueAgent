@@ -19,6 +19,8 @@ public class Agent {
    final static int WEST   = 2;
    final static int SOUTH  = 3;
 
+   final static char PROMPT_USER = 'X';
+
    private char[][] map;
 
    private int irow,icol; // initial row and column
@@ -46,19 +48,18 @@ public class Agent {
       // REPLACE THIS CODE WITH AI TO CHOOSE ACTION
 
       int ch=0;
-      System.out.println("Row="+row);
-      System.out.println("Col="+col);
 
       System.out.print("Enter Action(s): ");
-      /*
-      try {
-         while ( ch != -1 ) {
+      char action = walkAround();
+      if (action == PROMPT_USER) {
+         try {
+            while ( ch != -1 ) {
             // read character from keyboard
-            ch  = System.in.read();
+               ch  = System.in.read();
 
             switch( ch ) { // if character is a valid action, return it
-            case 'F': case 'L': case 'R': case 'C': case 'O': case 'B':
-            case 'f': case 'l': case 'r': case 'c': case 'o': case 'b':
+               case 'F': case 'L': case 'R': case 'C': case 'O': case 'B':
+               case 'f': case 'l': case 'r': case 'c': case 'o': case 'b':
                return((char) ch );
             }
          }
@@ -66,11 +67,12 @@ public class Agent {
 
       catch (IOException e) {
          System.out.println ("IO error:" + e );
-      }*/
-      return walkAround();
-
-
+      }
    }
+   return action;
+
+
+}
 
    /* A* with limited visibility. To execute, need a couple of data structures:
     * OPEN list can be represented as a Priority Queue
@@ -87,6 +89,8 @@ public class Agent {
     */
 
    // walk around, remembering as much as possible of the map.
+   // TODO: implement checking each step for reachable, important things.
+   // get them if possible, otherwise ignore and continue exploring. 
    private char walkAround() {
       // if next tile is walkable, walk forward.
       // otherwise, remember last direction and keep making sure there's
@@ -111,6 +115,10 @@ public class Agent {
          startWalkR = row;
          startWalkC = col;
          return 'R';
+      } else if (startWalkC == col && startWalkR == row) {
+         // STOP this function
+         System.out.println("Walk completed!");
+         return PROMPT_USER;
       } else {
          if(isWalkable(getAdjacentTile(lastDirn))) {
             // turn towards it
@@ -138,27 +146,27 @@ public class Agent {
       int nextRow = 0; int nextCol = 0;
       switch( direction ) {
          case NORTH: 
-            d_row = -1; break;
+         d_row = -1; break;
          case SOUTH: 
-            d_row =  1; break;
+         d_row =  1; break;
          case EAST:  
-            d_col =  1; break;
+         d_col =  1; break;
          case WEST:  
-            d_col = -1; break;
-         }
-         nextRow = row + d_row;
-         nextCol = col + d_col;
+         d_col = -1; break;
+      }
+      nextRow = row + d_row;
+      nextCol = col + d_col;
          //ch is the object in front of us
-         next = map[nextRow][nextCol];
+      next = map[nextRow][nextCol];
 
       return next;
    }
 
    private boolean isWalkable(char tile) {
       switch(tile) {
-      case '*': case 'T': case '-': case '~':
+         case '*': case 'T': case '-': case '~':
          return false;
-      default:
+         default:
          return true;
       }
    }
@@ -210,13 +218,13 @@ public class Agent {
          // if direction not changed, look ahead 1 space to see what's there
          d_row = 0; d_col = 0;
          switch( dirn ) {
-         case NORTH: 
+            case NORTH: 
             d_row = -1; break;
-         case SOUTH: 
+            case SOUTH: 
             d_row =  1; break;
-         case EAST:  
+            case EAST:  
             d_col =  1; break;
-         case WEST:  
+            case WEST:  
             d_col = -1; break;
          }
          new_row = row + d_row;
@@ -230,23 +238,23 @@ public class Agent {
       case 'F': case 'f': // forward
          switch( ch ) {   // can't move into an obstacle or water
          case '*': case 'T': case '-': case '~':
-            return( false );
-         }
+         return( false );
+      }
          map[row][col] = ' '; // clear current location
          row = new_row;
          col = new_col;
          map[row][col] = ' '; // clear new location
 
          switch( ch ) {
-         case 'a': 
+            case 'a': 
             have_axe  = true;     break;
-         case 'k': 
+            case 'k': 
             have_key  = true;     break;
-         case 'g': 
+            case 'g': 
             have_gold = true;     break;
-         case 'd': 
+            case 'd': 
             num_dynamites_held++; break;
-         case '~': 
+            case '~': 
             game_lost = true;     break;
          }
          if( have_gold &&( row == irow )&&( col == icol )) {
@@ -254,8 +262,8 @@ public class Agent {
          }
          update_map(view);
          return( true );
-      case 'L': case 'R': case 'C': case 'O': case 'B':
-      case 'l': case 'r': case 'c': case 'o': case 'b':
+         case 'L': case 'R': case 'C': case 'O': case 'B':
+         case 'l': case 'r': case 'c': case 'o': case 'b':
          update_map(view);
          return(true);
       }
@@ -290,10 +298,10 @@ public class Agent {
       for( i = -2; i <= 2; i++ ) {
          for( j = -2; j <= 2; j++ ) {
             switch( dirn ) { // Adjust the orientation
-            case NORTH: r = row+i; c = col+j; break;
-            case SOUTH: r = row-i; c = col-j; break;
-            case EAST:  r = row+j; c = col-i; break;
-            case WEST:  r = row-j; c = col+i; break;
+               case NORTH: r = row+i; c = col+j; break;
+               case SOUTH: r = row-i; c = col-j; break;
+               case EAST:  r = row+j; c = col-i; break;
+               case WEST:  r = row-j; c = col+i; break;
             }
             map[r][c] = view[2+i][2+j];
          }
@@ -310,10 +318,10 @@ public class Agent {
          for( c=0; c < map[r].length; c++ ) {
             if(( r == row )&&( c == col )) { // agent is here
                switch( dirn ) {
-               case NORTH: ch = '^'; break;
-               case EAST:  ch = '>'; break;
-               case SOUTH: ch = 'v'; break;
-               case WEST:  ch = '<'; break;
+                  case NORTH: ch = '^'; break;
+                  case EAST:  ch = '>'; break;
+                  case SOUTH: ch = 'v'; break;
+                  case WEST:  ch = '<'; break;
                }
             }
             else {
