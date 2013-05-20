@@ -19,33 +19,34 @@ public class Agent {
    final static int WEST   = 2;
    final static int SOUTH  = 3;
 
-   final static int ROW = 0;
-   final static int COL = 1;
+   final static int ROW    = 0;
+   final static int COL    = 1;
 
    final static char PROMPT_USER = 'X';
 
    private char[][] map;
 
-   private int irow,icol; // initial row and column
+   // initial row and column
+   private Point   startPoint;
 
    // current row, column and direction of agent
-   private int row,col,dirn;
+   private Point   currPoint;
+   private int     dirn;
    // for walking around, remember last direction.
    // is updated each time 
-   private int lastDirn;
+   private int     lastDirn;
    private boolean firstRun = true;
 
    private boolean willAdvance = false;
-   private int rowStartWalk, colStartWalk;
+   private Point   startWalk;
 
-   private boolean have_axe  = false;
-   private boolean have_key  = false;
-   private boolean have_gold = false;
+   private boolean have_axe            = false;
+   private boolean have_key            = false;
+   private boolean have_gold           = false;
+   private int     num_dynamites_held  = 0;
 
    private boolean game_won  = false;
    private boolean game_lost = false;
-
-   private int num_dynamites_held = 0;
 
 
    public char get_action(char[][] view) {
@@ -117,10 +118,8 @@ public class Agent {
       if (firstRun) {
          lastDirn = dirn;
          firstRun = false;
-
-         colStartWalk = col;
-         rowStartWalk = row;
-
+         
+         startWalk = new Point(currPoint.row, currPoint.col);
          return 'R';
       } else {
          if(isWalkable(getAdjacentTile(lastDirn))) {
@@ -145,8 +144,8 @@ public class Agent {
          // if next action is to advance, check whether we've done a full loop.
          // if so, stop looping around coast (and willadvance = false.)
          // if not, advance (and willadvance = false.)
-         int[] nextTile = getTilePosition(dirn);
-         if (nextTile[ROW] == rowStartWalk && nextTile[COL] == colStartWalk) {
+         Point nextTile = getTilePosition(dirn);
+         if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
             willAdvance = false;
             return PROMPT_USER;
          } else {
@@ -159,20 +158,22 @@ public class Agent {
 
    private char getAdjacentTile(int direction) {
       char next = '~'; // assume unsafe unless otherwise known
-      int d_row = 0; int d_col = 0;
+      Point delta = new Point(0,0);
       int nextRow = 0; int nextCol = 0;
+
       switch( direction ) {
          case NORTH: 
-         d_row = -1; break;
+         delta.row = -1; break;
          case SOUTH: 
-         d_row =  1; break;
+         delta.row =  1; break;
          case EAST:  
-         d_col =  1; break;
+         delta.col =  1; break;
          case WEST:  
-         d_col = -1; break;
+         delta.col = -1; break;
       }
-      nextRow = row + d_row;
-      nextCol = col + d_col;
+
+      nextRow = currPoint.row + delta.row;
+      nextCol = currPoint.col + delta.col;
       //ch is the object in front of us
       next = map[nextRow][nextCol];
 
@@ -180,22 +181,22 @@ public class Agent {
    }
 
    // returns an array of size 2 ([row,col]) of point in direction
-   private int[] getTilePosition(int direction) {
-      int tile[] = new int[2];
-      int d_row = 0; int d_col = 0;
-      tile[0] = 0; tile[1] = 0;
+   private Point getTilePosition(int direction) {
+      Point tile;
+      Point delta = new Point(0,0);
+
       switch( direction ) {
          case NORTH: 
-         d_row = -1; break;
+         delta.row = -1; break;
          case SOUTH: 
-         d_row =  1; break;
+         delta.row =  1; break;
          case EAST:  
-         d_col =  1; break;
+         delta.col =  1; break;
          case WEST:  
-         d_col = -1; break;
+         delta.col = -1; break;
       }
-      tile[ROW] = row + d_row;
-      tile[COL] = col + d_col;
+
+      tile = new Point(currPoint.row + delta.row, currPoint.col + delta.col);
       return tile;
    }
 
@@ -264,8 +265,8 @@ public class Agent {
             case WEST:  
             d_col = -1; break;
          }
-         new_row = row + d_row;
-         new_col = col + d_col;
+         new_row = currPoint.row + d_row;
+         new_col = currPoint.col + d_col;
          //ch is the object in front of us
          ch = map[new_row][new_col];
       }
@@ -277,10 +278,10 @@ public class Agent {
          case '*': case 'T': case '-': case '~':
          return( false );
       }
-         map[row][col] = ' '; // clear current location
-         row = new_row;
-         col = new_col;
-         map[row][col] = ' '; // clear new location
+         map[currPoint.row][currPoint.col] = ' '; // clear current location
+         currPoint.row = new_row;
+         currPoint.col = new_col;
+         map[currPoint.row][currPoint.col] = ' '; // clear new location
 
          switch( ch ) {
             case 'a': 
@@ -294,7 +295,7 @@ public class Agent {
             case '~': 
             game_lost = true;     break;
          }
-         if( have_gold &&( row == irow )&&( col == icol )) {
+         if( have_gold &&( currPoint.row == startPoint.row )&&( currPoint.col == startPoint.col )) {
             game_won = true;
          }
          update_map(view);
@@ -312,10 +313,9 @@ public class Agent {
    private void init_world(char view[][] ) {
 
       //The intial setup of agent position
-      row = 100;
-      col = 100;
-      irow = 100;
-      icol = 100;
+      currPoint = new Point(100,100);
+      startPoint = new Point(100,100);
+
       //The way the agent is facing is considered north
       dirn = NORTH;
 
@@ -335,10 +335,10 @@ public class Agent {
       for( i = -2; i <= 2; i++ ) {
          for( j = -2; j <= 2; j++ ) {
             switch( dirn ) { // Adjust the orientation
-               case NORTH: r = row+i; c = col+j; break;
-               case SOUTH: r = row-i; c = col-j; break;
-               case EAST:  r = row+j; c = col-i; break;
-               case WEST:  r = row-j; c = col+i; break;
+               case NORTH: r = currPoint.row+i; c = currPoint.col+j; break;
+               case SOUTH: r = currPoint.row-i; c = currPoint.col-j; break;
+               case EAST:  r = currPoint.row+j; c = currPoint.col-i; break;
+               case WEST:  r = currPoint.row-j; c = currPoint.col+i; break;
             }
             map[r][c] = view[2+i][2+j];
          }
@@ -354,7 +354,7 @@ public class Agent {
       System.out.println("\n");
       for( r=0; r < 200; r++ ) {
          for( c=0; c < map[r].length; c++ ) {
-            if(( r == row )&&( c == col )) { // agent is here
+            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
                switch( dirn ) {
                   case NORTH: ch = '^'; break;
                   case EAST:  ch = '>'; break;
