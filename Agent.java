@@ -25,6 +25,11 @@ public class Agent {
 
    // current row, column and direction of agent
    private int row,col,dirn;
+   // for walking around, remember last direction.
+   // is updated each time 
+   private int lastDirn;
+   private boolean firstRun = true;
+   private int startWalkR, startWalkC;
 
    private boolean have_axe  = false;
    private boolean have_key  = false;
@@ -84,18 +89,54 @@ public class Agent {
    // walk around, remembering as much as possible of the map.
    private char walkAround() {
       // if next tile is walkable, walk forward.
-      if (isWalkable(getNextTile())) {
+      // otherwise, remember last direction and keep making sure there's
+      // an unwalkable tile there.
+      // If last dirn walkable, turn towards it. 
+      if (firstRun && isWalkable(getAdjacentTile(dirn))) {
          return 'F';
       } else {
-         return 'R';
+         return followCoast();
       }
    }
 
-   private char getNextTile() {
+   // to find coast first, go forwards blindly. Once found, calibrate that as
+   // first direction. make sure an obstacle remains on that side, otherwise turn towards it. 
+   // if obstacle on side of original direction and in front, update new direction to current facing
+   // direction and repeat. 
+
+   private char followCoast() {
+      if (firstRun) {
+         lastDirn = dirn;
+         firstRun = false;
+         startWalkR = row;
+         startWalkC = col;
+         return 'R';
+      } else {
+         if(isWalkable(getAdjacentTile(lastDirn))) {
+            // turn towards it
+            // left turn = bigger number, right = smaller.
+            if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
+               return 'L';
+            } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
+               return 'R';
+            } else {
+               return 'F';
+            }
+         } else if (!isWalkable(getAdjacentTile(lastDirn)) && !isWalkable(getAdjacentTile(dirn))) {
+         // else if is not walkable and forward is not walkable, update lastDirn and turn R
+            lastDirn = dirn;
+            return 'R';
+         } else {
+            return 'F';
+         }
+      }
+   }
+
+   private char getAdjacentTile(int direction) {
       char next = '~'; // assume unsafe unless otherwise known
       int d_row = 0; int d_col = 0;
       int nextRow = 0; int nextCol = 0;
-      switch( dirn ) {
+      switch( direction ) {
          case NORTH: 
             d_row = -1; break;
          case SOUTH: 
