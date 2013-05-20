@@ -19,6 +19,9 @@ public class Agent {
    final static int WEST   = 2;
    final static int SOUTH  = 3;
 
+   final static int ROW = 0;
+   final static int COL = 1;
+
    final static char PROMPT_USER = 'X';
 
    private char[][] map;
@@ -31,7 +34,9 @@ public class Agent {
    // is updated each time 
    private int lastDirn;
    private boolean firstRun = true;
-   private int startWalkR, startWalkC;
+
+   private boolean willAdvance = false;
+   private int rowStartWalk, colStartWalk;
 
    private boolean have_axe  = false;
    private boolean have_key  = false;
@@ -49,9 +54,9 @@ public class Agent {
 
       int ch=0;
 
-      System.out.print("Enter Action(s): ");
       char action = walkAround();
       if (action == PROMPT_USER) {
+         System.out.print("Enter Action(s): ");
          try {
             while ( ch != -1 ) {
             // read character from keyboard
@@ -112,13 +117,11 @@ public class Agent {
       if (firstRun) {
          lastDirn = dirn;
          firstRun = false;
-         startWalkR = row;
-         startWalkC = col;
+
+         colStartWalk = col;
+         rowStartWalk = row;
+
          return 'R';
-      } else if (startWalkC == col && startWalkR == row) {
-         // STOP this function
-         System.out.println("Walk completed!");
-         return PROMPT_USER;
       } else {
          if(isWalkable(getAdjacentTile(lastDirn))) {
             // turn towards it
@@ -128,16 +131,30 @@ public class Agent {
             } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
                return 'R';
             } else {
-               return 'F';
+               willAdvance = true;
             }
          } else if (!isWalkable(getAdjacentTile(lastDirn)) && !isWalkable(getAdjacentTile(dirn))) {
-         // else if is not walkable and forward is not walkable, update lastDirn and turn R
+            // else if not walkable and forward is not walkable, update lastDirn and turn R
             lastDirn = dirn;
             return 'R';
          } else {
+            willAdvance = true;
+         }
+      }
+      if (willAdvance) {
+         // if next action is to advance, check whether we've done a full loop.
+         // if so, stop looping around coast (and willadvance = false.)
+         // if not, advance (and willadvance = false.)
+         int[] nextTile = getTilePosition(dirn);
+         if (nextTile[ROW] == rowStartWalk && nextTile[COL] == colStartWalk) {
+            willAdvance = false;
+            return PROMPT_USER;
+         } else {
+            willAdvance = false;
             return 'F';
          }
       }
+      return PROMPT_USER;
    }
 
    private char getAdjacentTile(int direction) {
@@ -156,10 +173,30 @@ public class Agent {
       }
       nextRow = row + d_row;
       nextCol = col + d_col;
-         //ch is the object in front of us
+      //ch is the object in front of us
       next = map[nextRow][nextCol];
 
       return next;
+   }
+
+   // returns an array of size 2 ([row,col]) of point in direction
+   private int[] getTilePosition(int direction) {
+      int tile[] = new int[2];
+      int d_row = 0; int d_col = 0;
+      tile[0] = 0; tile[1] = 0;
+      switch( direction ) {
+         case NORTH: 
+         d_row = -1; break;
+         case SOUTH: 
+         d_row =  1; break;
+         case EAST:  
+         d_col =  1; break;
+         case WEST:  
+         d_col = -1; break;
+      }
+      tile[ROW] = row + d_row;
+      tile[COL] = col + d_col;
+      return tile;
    }
 
    private boolean isWalkable(char tile) {
@@ -313,7 +350,8 @@ public class Agent {
    private void print_map() {
       char ch=' ';
       int r,c;
-      System.out.println();
+      boolean interestingLine = false;
+      System.out.println("\n");
       for( r=0; r < 200; r++ ) {
          for( c=0; c < map[r].length; c++ ) {
             if(( r == row )&&( c == col )) { // agent is here
@@ -327,9 +365,15 @@ public class Agent {
             else {
                ch = map[r][c];
             }
-            System.out.print( ch );
+            if (ch != 'X') {
+               System.out.print( ch );
+               interestingLine = true;
+            }
          }
-         System.out.println();
+         if (interestingLine) {
+            System.out.println();
+            interestingLine = false;
+         }
       }
       System.out.println();
    }
