@@ -24,7 +24,7 @@ public class Agent {
 
    final static char PROMPT_USER = 'X';
 
-   private char[][] map;
+   private Map map;
 
    // initial row and column
    private Point   startPoint;
@@ -56,6 +56,7 @@ public class Agent {
       int ch=0;
 
       char action = walkAround();
+      //char action = PROMPT_USER;
       if (action == PROMPT_USER) {
          System.out.print("Enter Action(s): ");
          try {
@@ -102,7 +103,7 @@ public class Agent {
       // otherwise, remember last direction and keep making sure there's
       // an unwalkable tile there.
       // If last dirn walkable, turn towards it. 
-      if (firstRun && isWalkable(getAdjacentTile(dirn))) {
+      if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
          return 'F';
       } else {
          return followCoast();
@@ -118,11 +119,11 @@ public class Agent {
       if (firstRun) {
          lastDirn = dirn;
          firstRun = false;
-         
          startWalk = new Point(currPoint.row, currPoint.col);
          return 'R';
       } else {
-         if(isWalkable(getAdjacentTile(lastDirn))) {
+         Point adjacentTile = map.getTileInDirection(lastDirn, currPoint);
+         if(isWalkable(adjacentTile)) {
             // turn towards it
             // left turn = bigger number, right = smaller.
             if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
@@ -132,7 +133,8 @@ public class Agent {
             } else {
                willAdvance = true;
             }
-         } else if (!isWalkable(getAdjacentTile(lastDirn)) && !isWalkable(getAdjacentTile(dirn))) {
+         } else if (!isWalkable(adjacentTile) && 
+                        !isWalkable(map.getTileInDirection(dirn, currPoint))) {
             // else if not walkable and forward is not walkable, update lastDirn and turn R
             lastDirn = dirn;
             return 'R';
@@ -144,7 +146,7 @@ public class Agent {
          // if next action is to advance, check whether we've done a full loop.
          // if so, stop looping around coast (and willadvance = false.)
          // if not, advance (and willadvance = false.)
-         Point nextTile = getTilePosition(dirn);
+         Point nextTile = map.getTileInDirection(dirn, currPoint);
          if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
             willAdvance = false;
             return PROMPT_USER;
@@ -156,51 +158,17 @@ public class Agent {
       return PROMPT_USER;
    }
 
-   private char getAdjacentTile(int direction) {
-      char next = '~'; // assume unsafe unless otherwise known
-      Point delta = new Point(0,0);
-      int nextRow = 0; int nextCol = 0;
-
-      switch( direction ) {
-         case NORTH: 
-         delta.row = -1; break;
-         case SOUTH: 
-         delta.row =  1; break;
-         case EAST:  
-         delta.col =  1; break;
-         case WEST:  
-         delta.col = -1; break;
-      }
-
-      nextRow = currPoint.row + delta.row;
-      nextCol = currPoint.col + delta.col;
-      //ch is the object in front of us
-      next = map[nextRow][nextCol];
-
-      return next;
-   }
-
-   // returns an array of size 2 ([row,col]) of point in direction
-   private Point getTilePosition(int direction) {
-      Point tile;
-      Point delta = new Point(0,0);
-
-      switch( direction ) {
-         case NORTH: 
-         delta.row = -1; break;
-         case SOUTH: 
-         delta.row =  1; break;
-         case EAST:  
-         delta.col =  1; break;
-         case WEST:  
-         delta.col = -1; break;
-      }
-
-      tile = new Point(currPoint.row + delta.row, currPoint.col + delta.col);
-      return tile;
-   }
-
    private boolean isWalkable(char tile) {
+      switch(tile) {
+         case '*': case 'T': case '-': case '~':
+         return false;
+         default:
+         return true;
+      }
+   }
+
+   private boolean isWalkable(Point p) {
+      char tile = p.value;
       switch(tile) {
          case '*': case 'T': case '-': case '~':
          return false;
@@ -234,10 +202,12 @@ public class Agent {
     ****************************************************************/
 
    //Update the world view based on the previous action taken
+   // REFACTOR
    private boolean update_world( char action, char view[][] ){
       int d_row, d_col;
       int new_row, new_col;
       char ch;
+      Point p;
 
       // run the first time only
       if ( action == 'i') {
@@ -254,34 +224,22 @@ public class Agent {
          return( true );
       } else { 
          // if direction not changed, look ahead 1 space to see what's there
-         d_row = 0; d_col = 0;
-         switch( dirn ) {
-            case NORTH: 
-            d_row = -1; break;
-            case SOUTH: 
-            d_row =  1; break;
-            case EAST:  
-            d_col =  1; break;
-            case WEST:  
-            d_col = -1; break;
-         }
-         new_row = currPoint.row + d_row;
-         new_col = currPoint.col + d_col;
-         //ch is the object in front of us
-         ch = map[new_row][new_col];
+         p = map.getTileInDirection(dirn, currPoint);
+         ch = p.value;
       }
 
       // if no direction changes to be made:
       switch( action ) {
       case 'F': case 'f': // forward
          switch( ch ) {   // can't move into an obstacle or water
-         case '*': case 'T': case '-': case '~':
-         return( false );
-      }
-         map[currPoint.row][currPoint.col] = ' '; // clear current location
-         currPoint.row = new_row;
-         currPoint.col = new_col;
-         map[currPoint.row][currPoint.col] = ' '; // clear new location
+            case '*': case 'T': case '-': case '~':
+            return( false );
+         }
+         map.setTile(new Point(currPoint.row, currPoint.col, ' ')); // clear current location
+         currPoint.row = p.row;
+         currPoint.col = p.col;
+         currPoint.dirn = dirn;
+         map.setTile(new Point(currPoint.row, currPoint.col, ' ')); // clear new location
 
          switch( ch ) {
             case 'a': 
@@ -298,11 +256,11 @@ public class Agent {
          if( have_gold &&( currPoint.row == startPoint.row )&&( currPoint.col == startPoint.col )) {
             game_won = true;
          }
-         update_map(view);
+         map.updateMap(view, currPoint);
          return( true );
          case 'L': case 'R': case 'C': case 'O': case 'B':
          case 'l': case 'r': case 'c': case 'o': case 'b':
-         update_map(view);
+         map.updateMap(view, currPoint);
          return(true);
       }
       return(false);
@@ -320,62 +278,9 @@ public class Agent {
       dirn = NORTH;
 
       //Initialize the map
-      map = new char[200][200];
-      for (int i = 0; i < 200; i++) {
-         for (int j = 0 ;j < 200; j++) {
-            map[i][j] = 'X';
-         }
-      }
-      update_map( view  );
-   }
-
-
-   private void update_map(char view[][] ) {
-      int r=0,c=0,i,j;
-      for( i = -2; i <= 2; i++ ) {
-         for( j = -2; j <= 2; j++ ) {
-            switch( dirn ) { // Adjust the orientation
-               case NORTH: r = currPoint.row+i; c = currPoint.col+j; break;
-               case SOUTH: r = currPoint.row-i; c = currPoint.col-j; break;
-               case EAST:  r = currPoint.row+j; c = currPoint.col-i; break;
-               case WEST:  r = currPoint.row-j; c = currPoint.col+i; break;
-            }
-            map[r][c] = view[2+i][2+j];
-         }
-      }
-      print_map();
-   }
-
-   //Print the larger map for fun while debugging
-   private void print_map() {
-      char ch=' ';
-      int r,c;
-      boolean interestingLine = false;
-      System.out.println("\n");
-      for( r=0; r < 200; r++ ) {
-         for( c=0; c < map[r].length; c++ ) {
-            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
-               switch( dirn ) {
-                  case NORTH: ch = '^'; break;
-                  case EAST:  ch = '>'; break;
-                  case SOUTH: ch = 'v'; break;
-                  case WEST:  ch = '<'; break;
-               }
-            }
-            else {
-               ch = map[r][c];
-            }
-            if (ch != 'X') {
-               System.out.print( ch );
-               interestingLine = true;
-            }
-         }
-         if (interestingLine) {
-            System.out.println();
-            interestingLine = false;
-         }
-      }
-      System.out.println();
+      map = new Map(200,200,Map.UNVISITED);
+      
+      map.updateMap(view, currPoint);
    }
 
    public static void main( String[] args ){
