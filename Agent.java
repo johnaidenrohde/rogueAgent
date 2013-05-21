@@ -9,6 +9,7 @@
 
 
 import java.util.*;
+import java.lang.*;
 import java.io.*;
 import java.net.*;
 
@@ -58,6 +59,30 @@ public class Agent {
       char action = walkAround();
       //char action = PROMPT_USER;
       if (action == PROMPT_USER) {
+         // THE FOLLOWING FOR DEBUGGING ONLY:
+         System.out.println("Walk completed! Found:");
+         
+         Point axe, gold, key;
+         Vector<Point> dynamite;
+         axe = map.getAxe();
+         gold = map.getGold();
+         key = map.getKey();
+         dynamite = map.getDynamite();
+
+         if (axe != null) {
+            System.out.println("Axe at row:" + axe.row + " col:" + axe.col);
+         }
+         if (gold != null) {
+            System.out.println("Gold at row:" + gold.row + " col:" + gold.col);
+         }
+         if (key != null) {
+            System.out.println("Key at row:" + key.row + " col:" + key.col);
+         }
+         if (dynamite != null) {
+            System.out.println("Last dynamite at row:" + dynamite.lastElement().row + " col:" + dynamite.lastElement().col);
+         }
+         // END DEBUGGING  
+
          System.out.print("Enter Action(s): ");
          try {
             while ( ch != -1 ) {
