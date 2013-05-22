@@ -64,15 +64,15 @@ public class Map {
 	            else {
 	            	ch = map[r][c];
 	            }
-	            if (ch != 'X') {
+	            //if (ch != 'X') {
 	            	System.out.print( ch );
 	            	interestingLine = true;
-	            }
+	            //}
         	}
-        	if (interestingLine) {
+        	//if (interestingLine) {
         		System.out.println();
         		interestingLine = false;
-        	}
+        	//}
     	}
 
     	System.out.println();

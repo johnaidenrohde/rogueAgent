@@ -22,3 +22,18 @@ Making a map:
     The incoming data is printed onto the map every time a forward move is made
     or something is blown up/chopped
 
+
+
+THE PLAN:
+	Explore.
+		Pledge/Wallfollow
+		Hunt X
+			while(findOrphanedX):
+				Pathfind to X
+				FollowPath
+	Search solution.
+		If(Pathfind('g')):
+			FollowPath
+			return YAY!
+		else:
+			if(pathFind())
