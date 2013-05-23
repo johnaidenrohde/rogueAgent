@@ -25,15 +25,29 @@ Making a map:
 
 
 THE PLAN:
+
 	Explore.
+	---------
+
+	walkAround(gameState):
 		Pledge/Wallfollow
 		Hunt X
 			while(findOrphanedX):
 				Pathfind to X
 				FollowPath
+
 	Search solution.
+	-----------------
+
+	makePlan(gameState):
 		If(Pathfind('g')):
 			FollowPath
 			return YAY!
 		else:
-			if(pathFind())
+			if(pathFind(a) && !haveaxe):
+				destroyTrees();
+			if(pathFind(k) && !havekey):
+				openDoors();
+			if(pathFind(d) && !havedyn):
+				dynamite();
+		makePlan; 
