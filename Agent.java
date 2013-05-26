@@ -40,6 +40,7 @@ public class Agent {
    private boolean firstRun = true;
 
    private boolean willAdvance = false;
+   private boolean adjustDirn = false;
    private Point   startWalk;
 
    private boolean have_axe            = false;
@@ -208,6 +209,7 @@ public class Agent {
             // wall is backLeft
             Point frontLeft;
             Point backLeft;
+            // apologies for this in advance
             switch (dirn) {
                case NORTH:
                   frontLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
@@ -231,17 +233,21 @@ public class Agent {
             }
 
             if (!isWalkable(backLeft)) {
-               wallDirn = dirn + 1;
+               wallDirn = wallDirn + 1;
                wallDirn = wallDirn % 4;
+               System.out.println("Wall is at " + wallDirn);
+               adjustDirn = true;
                willAdvance = true;
                return 'L';
             }
-            if (!isWalkable(frontLeft)) {
+            if (!isWalkable(frontLeft) && isWalkable(map.getTileInDirection(dirn, currPoint))) {
                // go forwards
+               wallDirn = dirn + 1;
+               wallDirn = wallDirn % 4;
+               System.out.println("Wall is at " + wallDirn);
                return 'F';
             }
             
-            System.out.println("No wall encountered!\n\n\n\n");
             // first turn towards it, and update wall direction. 
             if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
                wallDirn = dirn + 1;
@@ -262,6 +268,9 @@ public class Agent {
             lastDirn = dirn;
             return 'R';
          } else if (!isWalkable(adjacentTile) && isWalkable(map.getTileInDirection(dirn, currPoint))) {
+            wallDirn = dirn + 1;
+            wallDirn = wallDirn % 4;
+            System.out.println("Wall is in direction " + wallDirn);
             willAdvance = true;
          }
       }
@@ -274,6 +283,15 @@ public class Agent {
             willAdvance = false;
             return PROMPT_USER;
          } else {
+            if (adjustDirn) {
+               // coming around edge
+               int wall = (dirn + 1) % 4;
+               Point left = map.getTileInDirection(wall, currPoint);
+               if (!isWalkable(left)) {
+                  wallDirn = wall;
+                  System.out.println("Adjustdirn wall at "+ wall);
+               }
+            }
             willAdvance = false;
             return 'F';
          }
