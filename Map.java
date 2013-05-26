@@ -1,6 +1,3 @@
-import java.lang.*;
-import java.util.*;
-
 public class Map {
 
 	public static final char UNVISITED = 'X';
@@ -18,12 +15,6 @@ public class Map {
 
 	private char[][] map;
 	public int numRows, numCols;
-
-
-	private Point   axe = null;
-	private Point   key = null;
-	private Point   gold = null;
-	private Vector<Point> dynamite = new Vector<Point>();
 
 	public Map (int rows, int cols, char initialValue) {
 		numRows = rows;
@@ -92,20 +83,6 @@ public class Map {
 	            	case SOUTH: r = currPoint.row-i; c = currPoint.col-j; break;
 	            	case EAST:  r = currPoint.row+j; c = currPoint.col-i; break;
 	            	case WEST:  r = currPoint.row-j; c = currPoint.col+i; break;
-            	}
-            	switch (view[2+i][2+j]) {
-            		case 'd':
-            			dynamite.add(new Point(r,c,'d'));
-            			break;
-            		case 'g':
-            			gold = new Point(r,c,'g');
-            			break;
-            		case 'k':
-            			key = new Point(r,c,'k');
-            			break;
-            		case 'a':
-            			axe = new Point (r,c,'a');
-            			break;
             	}
             	map[r][c] = view[2+i][2+j];
         	}
@@ -194,27 +171,6 @@ public class Map {
 		return p;
 	}
 
-	// getters for axe, key, gold, dynamite
-	// returns null if none exist
-	public Point getAxe() {
-		return axe;
-	}
-
-	public Point getKey() {
-		return key;
-	}
-
-	public Point getGold() {
-		return gold;
-	}
-
-	public Vector<Point> getDynamite() {
-		if (dynamite.isEmpty()) {
-			return null;
-		} else {
-			return dynamite;
-		}
-	}
 
 
 }
