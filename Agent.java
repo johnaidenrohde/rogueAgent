@@ -36,6 +36,7 @@ public class Agent {
    // for walking around, remember last direction.
    // is updated each time 
    private int     lastDirn;
+   private int     wallDirn;
    private boolean firstRun = true;
 
    private boolean willAdvance = false;
@@ -56,7 +57,7 @@ public class Agent {
 
       int ch=0;
 
-      char action = walkAround();
+      char action = walk();
       Vector<Point> x = map.findGroupsX();
       for (int i = 0; i < x.size(); i++) {
          Point y = x.get(i);
@@ -171,6 +172,96 @@ public class Agent {
             lastDirn = dirn;
             return 'R';
          } else {
+            willAdvance = true;
+         }
+      }
+      if (willAdvance) {
+         // if next action is to advance, check whether we've done a full loop.
+         // if so, stop looping around coast (and willadvance = false.)
+         // if not, advance (and willadvance = false.)
+         Point nextTile = map.getTileInDirection(dirn, currPoint);
+         if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
+            willAdvance = false;
+            return PROMPT_USER;
+         } else {
+            willAdvance = false;
+            return 'F';
+         }
+      }
+      return PROMPT_USER;
+   }
+
+   private char walk() {
+      if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
+         return 'F';
+      }
+
+      if (firstRun) {
+         lastDirn = dirn;
+         wallDirn = dirn;
+         firstRun = false;
+         startWalk = new Point(currPoint.row, currPoint.col);
+         return 'R';
+      } else {
+         Point adjacentTile = map.getTileInDirection(wallDirn, currPoint);
+         if (isWalkable(adjacentTile) && !willAdvance) {
+            // wall is backLeft
+            Point frontLeft;
+            Point backLeft;
+            switch (dirn) {
+               case NORTH:
+                  frontLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
+                  backLeft = map.getTileInDirection(map.SOUTH_WEST, currPoint);
+                  break;
+               case SOUTH:
+                  frontLeft = map.getTileInDirection(map.SOUTH_EAST, currPoint);
+                  backLeft = map.getTileInDirection(map.NORTH_EAST, currPoint);
+                  break;
+               case EAST:
+                  frontLeft = map.getTileInDirection(map.NORTH_EAST, currPoint);
+                  backLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
+                  break;
+               case WEST:
+                  frontLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
+                  backLeft = map.getTileInDirection(map.NORTH_EAST, currPoint);
+                  break;
+               default:
+                  frontLeft = null;
+                  backLeft = null;
+            }
+
+            if (!isWalkable(backLeft)) {
+               wallDirn = dirn + 1;
+               wallDirn = wallDirn % 4;
+               willAdvance = true;
+               return 'L';
+            }
+            if (!isWalkable(frontLeft)) {
+               // go forwards
+               return 'F';
+            }
+            
+            System.out.println("No wall encountered!\n\n\n\n");
+            // first turn towards it, and update wall direction. 
+            if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
+               wallDirn = dirn + 1;
+               wallDirn = wallDirn % 4;
+               return 'L';
+            } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
+               wallDirn = dirn - 1;
+               wallDirn = wallDirn % 4;
+               return 'R';
+            } else {
+               willAdvance = true;
+            }
+         } else if (!isWalkable(adjacentTile) && 
+            !isWalkable(map.getTileInDirection(dirn, currPoint))) {
+            // wall present and ahead blocked
+            // must change direction, wall is previous direction
+            wallDirn = dirn;
+            lastDirn = dirn;
+            return 'R';
+         } else if (!isWalkable(adjacentTile) && isWalkable(map.getTileInDirection(dirn, currPoint))) {
             willAdvance = true;
          }
       }

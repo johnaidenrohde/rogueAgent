@@ -9,6 +9,11 @@ public class Map {
    	final static int NORTH  = 1;
    	final static int WEST   = 2;
    	final static int SOUTH  = 3;
+   	// diagonals for wallfollowing
+   	final static int NORTH_EAST = 4;
+   	final static int SOUTH_EAST = 5;
+   	final static int SOUTH_WEST = 6;
+   	final static int NORTH_WEST = 7;
 
 
 	private char[][] map;
@@ -120,6 +125,19 @@ public class Map {
 			d_col =  1; break;
 			case WEST:  
 			d_col = -1; break;
+			case NORTH_EAST:
+			d_row = -1;
+			d_col = 1;
+			break;
+			case NORTH_WEST:
+			d_row = -1;
+			d_col = -1; break;
+			case SOUTH_EAST:
+			d_row = 1;
+			d_col = 1; break;
+			case SOUTH_WEST:
+			d_row = 1;
+			d_col = -1; break;
 		}
 		new_row = currPoint.row + d_row;
 		new_col = currPoint.col + d_col;
@@ -149,8 +167,6 @@ public class Map {
 				if (hasBlank && startX != -1 && map[i][j] == ' ') {
 					// all criteria for this line to have orphaned blanks true
 					centreXs = startX+(j - startX);
-					System.out.println("StartX = " + startX + ", j = " + j);
-					System.out.println("CentreXs = " + centreXs);
 					Point p = new Point(i, centreXs);
 					x.add(p);
 					// reset startX 
