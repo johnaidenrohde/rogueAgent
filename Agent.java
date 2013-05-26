@@ -25,7 +25,9 @@ public class Agent {
 
    final static char PROMPT_USER = 'X';
 
-   private Map map;
+   final static int MAX_SEARCH = 500;
+
+   private Map     map;
 
    // initial row and column
    private Point   startPoint;
@@ -33,14 +35,15 @@ public class Agent {
    // current row, column and direction of agent
    private Point   currPoint;
    private int     dirn;
+
    // for walking around, remember last direction.
    // is updated each time 
    private int     lastDirn;
    private int     wallDirn;
-   private boolean firstRun = true;
+   private boolean firstRun    = true;
 
    private boolean willAdvance = false;
-   private boolean adjustDirn = false;
+   private boolean adjustDirn  = false;
    private Point   startWalk;
 
    private boolean have_axe            = false;
@@ -51,10 +54,10 @@ public class Agent {
    private boolean game_won  = false;
    private boolean game_lost = false;
 
+   private int     numTurns  = 0;
+
 
    public char get_action(char[][] view) {
-
-      // REPLACE THIS CODE WITH AI TO CHOOSE ACTION
 
       int ch=0;
 
@@ -65,7 +68,7 @@ public class Agent {
          System.out.println("X group at: row="+y.row+", col="+y.col);
       }
       //char action = PROMPT_USER;
-      if (action == PROMPT_USER) {
+      if (action == PROMPT_USER || numTurns > MAX_SEARCH) {
          // THE FOLLOWING FOR DEBUGGING ONLY:
          System.out.println("Walk completed! Found:");
          
@@ -93,25 +96,24 @@ public class Agent {
          System.out.print("Enter Action(s): ");
          try {
             while ( ch != -1 ) {
-            // read character from keyboard
+               // read character from keyboard
                ch  = System.in.read();
 
-            switch( ch ) { // if character is a valid action, return it
-               case 'F': case 'L': case 'R': case 'C': case 'O': case 'B':
-               case 'f': case 'l': case 'r': case 'c': case 'o': case 'b':
-               return((char) ch );
+               switch( ch ) { // if character is a valid action, return it
+                  case 'F': case 'L': case 'R': case 'C': case 'O': case 'B':
+                  case 'f': case 'l': case 'r': case 'c': case 'o': case 'b':
+                  action = (char) ch;
+               }
             }
          }
-      }
 
-      catch (IOException e) {
-         System.out.println ("IO error:" + e );
+         catch (IOException e) {
+            System.out.println ("IO error:" + e );
+         }
       }
+      numTurns++;
+      return action;
    }
-   return action;
-
-
-}
 
    /* A* with limited visibility. To execute, need a couple of data structures:
     * OPEN list can be represented as a Priority Queue
@@ -128,70 +130,6 @@ public class Agent {
     */
 
    // walk around, remembering as much as possible of the map.
-   // TODO: implement checking each step for reachable, important things.
-   // get them if possible, otherwise ignore and continue exploring. 
-   /*
-   private char walkAround() {
-      // if next tile is walkable, walk forward.
-      // otherwise, remember last direction and keep making sure there's
-      // an unwalkable tile there.
-      // If last dirn walkable, turn towards it. 
-      if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
-         return 'F';
-      } else {
-         return followCoast();
-      }
-   }
-   */
-
-   // to find coast first, go forwards blindly. Once found, calibrate that as
-   // first direction. make sure an obstacle remains on that side, otherwise turn towards it. 
-   // if obstacle on side of original direction and in front, update new direction to current facing
-   // direction and repeat. 
-
-   private char followCoast() {
-      if (firstRun) {
-         lastDirn = dirn;
-         firstRun = false;
-         startWalk = new Point(currPoint.row, currPoint.col);
-         return 'R';
-      } else {
-         Point adjacentTile = map.getTileInDirection(lastDirn, currPoint);
-         if(isWalkable(adjacentTile)) {
-            // turn towards it
-            // left turn = bigger number, right = smaller.
-            if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
-               return 'L';
-            } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
-               return 'R';
-            } else {
-               willAdvance = true;
-            }
-         } else if (!isWalkable(adjacentTile) && 
-                        !isWalkable(map.getTileInDirection(dirn, currPoint))) {
-            // else if not walkable and forward is not walkable, update lastDirn and turn R
-            lastDirn = dirn;
-            return 'R';
-         } else {
-            willAdvance = true;
-         }
-      }
-      if (willAdvance) {
-         // if next action is to advance, check whether we've done a full loop.
-         // if so, stop looping around coast (and willadvance = false.)
-         // if not, advance (and willadvance = false.)
-         Point nextTile = map.getTileInDirection(dirn, currPoint);
-         if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
-            willAdvance = false;
-            return PROMPT_USER;
-         } else {
-            willAdvance = false;
-            return 'F';
-         }
-      }
-      return PROMPT_USER;
-   }
-
    private char walk() {
       if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
          return 'F';
@@ -235,7 +173,6 @@ public class Agent {
             if (!isWalkable(backLeft)) {
                wallDirn = wallDirn + 1;
                wallDirn = wallDirn % 4;
-               System.out.println("Wall is at " + wallDirn);
                adjustDirn = true;
                willAdvance = true;
                return 'L';
@@ -244,7 +181,6 @@ public class Agent {
                // go forwards
                wallDirn = dirn + 1;
                wallDirn = wallDirn % 4;
-               System.out.println("Wall is at " + wallDirn);
                return 'F';
             }
             
@@ -270,7 +206,6 @@ public class Agent {
          } else if (!isWalkable(adjacentTile) && isWalkable(map.getTileInDirection(dirn, currPoint))) {
             wallDirn = dirn + 1;
             wallDirn = wallDirn % 4;
-            System.out.println("Wall is in direction " + wallDirn);
             willAdvance = true;
          }
       }
@@ -279,9 +214,15 @@ public class Agent {
          // if so, stop looping around coast (and willadvance = false.)
          // if not, advance (and willadvance = false.)
          Point nextTile = map.getTileInDirection(dirn, currPoint);
+         Point leftTile = map.getTileInDirection(wallDirn, currPoint);
          if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
-            willAdvance = false;
-            return PROMPT_USER;
+            if (leftTile.value != '~' && isWalkable(nextTile)) {
+               firstRun = true;
+               return 'F';
+            } else {
+               willAdvance = false;
+               return PROMPT_USER;
+            }
          } else {
             if (adjustDirn) {
                // coming around edge
@@ -289,7 +230,6 @@ public class Agent {
                Point left = map.getTileInDirection(wall, currPoint);
                if (!isWalkable(left)) {
                   wallDirn = wall;
-                  System.out.println("Adjustdirn wall at "+ wall);
                }
             }
             willAdvance = false;
@@ -297,63 +237,6 @@ public class Agent {
          }
       }
       return PROMPT_USER;
-   }
-
-   private char walkAround() {
-      // initially, go forwards 
-      if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
-         return 'F';
-      }
-
-      if (firstRun) {
-         lastDirn = dirn;
-         firstRun = false;
-         startWalk = new Point(currPoint.row, currPoint.col);
-         return 'R';
-      } else {
-         Point adjacentTile = map.getTileInDirection(lastDirn, currPoint);
-         if(isWalkable(adjacentTile)) {
-            // turn towards it
-            // left turn = bigger number, right = smaller.
-            if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
-               return 'L';
-            } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
-               return 'R';
-            } else {
-               willAdvance = true;
-            }
-         } else if (!isWalkable(adjacentTile) && 
-                        !isWalkable(map.getTileInDirection(dirn, currPoint))) {
-            // else if not walkable and forward is not walkable, update lastDirn and turn R
-            lastDirn = dirn;
-            return 'R';
-         } else {
-            willAdvance = true;
-         }
-      }
-      if (willAdvance) {
-         // if next action is to advance, check whether we've done a full loop.
-         // if so, stop looping around coast (and willadvance = false.)
-         // if not, advance (and willadvance = false.)
-         Point nextTile = map.getTileInDirection(dirn, currPoint);
-         if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
-            willAdvance = false;
-            return PROMPT_USER;
-         } else {
-            willAdvance = false;
-            return 'F';
-         }
-      }
-      return PROMPT_USER;
-   }
-
-   private boolean isWalkable(char tile) {
-      switch(tile) {
-         case '*': case 'T': case '-': case '~':
-         return false;
-         default:
-         return true;
-      }
    }
 
    private boolean isWalkable(Point p) {
@@ -391,7 +274,6 @@ public class Agent {
     ****************************************************************/
 
    //Update the world view based on the previous action taken
-   // REFACTOR
    private boolean update_world( char action, char view[][] ){
       int d_row, d_col;
       int new_row, new_col;

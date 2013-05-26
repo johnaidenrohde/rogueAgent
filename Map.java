@@ -147,6 +147,18 @@ public class Map {
 		return tile;
 	}
 
+	public boolean isAdjacentTo(Point p, Point curr) {
+		int dRow, dCol;
+		dRow = p.row - curr.row;
+		dCol = p.col - curr.col;
+		dRow *= dRow;
+		dCol *= dCol;
+		if (dRow < 1 && dCol < 1) {
+			return true;
+		}
+		return false;
+	}
+
 	public Vector<Point> findGroupsX () {
 		// Vector of points, each point is center of first line of X group.
 		Vector<Point> x = new Vector<Point>();
