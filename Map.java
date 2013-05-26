@@ -129,6 +129,39 @@ public class Map {
 		return tile;
 	}
 
+	public Vector<Point> findGroupsX () {
+		// Vector of points, each point is center of first line of X group.
+		Vector<Point> x = new Vector<Point>();
+		// must only find groups of Xs with blanks on both sides.
+		int i;
+		for (i = 0; i < numRows; i++) {
+			int j;
+			boolean hasBlank = false;
+			int startX = -1;
+			int centreXs = -1;
+			for (j = 0; j < numCols; j++) {
+				if (map[i][j] == ' ') {
+					hasBlank = true;
+				}
+				if (hasBlank && map[i][j] == 'X') {
+					startX = j;
+				}
+				if (hasBlank && startX != -1 && map[i][j] == ' ') {
+					// all criteria for this line to have orphaned blanks true
+					centreXs = startX+(j - startX);
+					System.out.println("StartX = " + startX + ", j = " + j);
+					System.out.println("CentreXs = " + centreXs);
+					Point p = new Point(i, centreXs);
+					x.add(p);
+					// reset startX 
+					startX = -1;
+				}
+			} // finished scanning line
+			
+		}
+		return x;
+	}
+
 	public void setTile(Point location) {
 		map[location.row][location.col] = location.value;
 	}

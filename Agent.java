@@ -57,6 +57,11 @@ public class Agent {
       int ch=0;
 
       char action = walkAround();
+      Vector<Point> x = map.findGroupsX();
+      for (int i = 0; i < x.size(); i++) {
+         Point y = x.get(i);
+         System.out.println("X group at: row="+y.row+", col="+y.col);
+      }
       //char action = PROMPT_USER;
       if (action == PROMPT_USER) {
          // THE FOLLOWING FOR DEBUGGING ONLY:
@@ -123,6 +128,7 @@ public class Agent {
    // walk around, remembering as much as possible of the map.
    // TODO: implement checking each step for reachable, important things.
    // get them if possible, otherwise ignore and continue exploring. 
+   /*
    private char walkAround() {
       // if next tile is walkable, walk forward.
       // otherwise, remember last direction and keep making sure there's
@@ -134,6 +140,7 @@ public class Agent {
          return followCoast();
       }
    }
+   */
 
    // to find coast first, go forwards blindly. Once found, calibrate that as
    // first direction. make sure an obstacle remains on that side, otherwise turn towards it. 
@@ -141,6 +148,54 @@ public class Agent {
    // direction and repeat. 
 
    private char followCoast() {
+      if (firstRun) {
+         lastDirn = dirn;
+         firstRun = false;
+         startWalk = new Point(currPoint.row, currPoint.col);
+         return 'R';
+      } else {
+         Point adjacentTile = map.getTileInDirection(lastDirn, currPoint);
+         if(isWalkable(adjacentTile)) {
+            // turn towards it
+            // left turn = bigger number, right = smaller.
+            if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
+               return 'L';
+            } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
+               return 'R';
+            } else {
+               willAdvance = true;
+            }
+         } else if (!isWalkable(adjacentTile) && 
+                        !isWalkable(map.getTileInDirection(dirn, currPoint))) {
+            // else if not walkable and forward is not walkable, update lastDirn and turn R
+            lastDirn = dirn;
+            return 'R';
+         } else {
+            willAdvance = true;
+         }
+      }
+      if (willAdvance) {
+         // if next action is to advance, check whether we've done a full loop.
+         // if so, stop looping around coast (and willadvance = false.)
+         // if not, advance (and willadvance = false.)
+         Point nextTile = map.getTileInDirection(dirn, currPoint);
+         if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
+            willAdvance = false;
+            return PROMPT_USER;
+         } else {
+            willAdvance = false;
+            return 'F';
+         }
+      }
+      return PROMPT_USER;
+   }
+
+   private char walkAround() {
+      // initially, go forwards 
+      if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
+         return 'F';
+      }
+
       if (firstRun) {
          lastDirn = dirn;
          firstRun = false;
