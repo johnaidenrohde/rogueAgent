@@ -170,28 +170,28 @@ public class Map {
 		fCol = from.col;
 		tRow = to.row;
 		tCol = to.col;
-		if (fRow = tRow - 1) {
+		if (fRow == tRow - 1) {
 			if (fCol == tCol) {
 				return NORTH;
-			} else if (fCol = tCol - 1) {
+			} else if (fCol == tCol - 1) {
 				return NORTH_EAST;
-			} else if (fCol = tCol + 1) {
+			} else if (fCol == tCol + 1) {
 				return NORTH_WEST;
 			}
 		} else if (fRow == tRow) {
-			if (fCol = tCol - 1) {
+			if (fCol == tCol - 1) {
 				return EAST;
-			} else if (fCol = tCol + 1) {
+			} else if (fCol == tCol + 1) {
 				return WEST;
 			} else {
 				return -1;
 			}
-		} else if (fRow = tRow + 1) {
+		} else if (fRow == tRow + 1) {
 			if (fCol == tCol) {
 				return SOUTH;
-			} else if (fCol = tCol - 1) {
+			} else if (fCol == tCol - 1) {
 				return SOUTH_EAST;
-			} else if (fCol = tCol + 1) {
+			} else if (fCol == tCol + 1) {
 				return SOUTH_WEST;
 			}
 		} else {
