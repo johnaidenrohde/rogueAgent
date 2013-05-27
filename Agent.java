@@ -20,9 +20,6 @@ public class Agent {
    final static int WEST   = 2;
    final static int SOUTH  = 3;
 
-   final static int ROW    = 0;
-   final static int COL    = 1;
-
    final static char PROMPT_USER = 'X';
 
    final static int MAX_SEARCH = 500;
@@ -36,15 +33,9 @@ public class Agent {
    private Point   currPoint;
    private int     dirn;
 
-   // for walking around, remember last direction.
-   // is updated each time 
-   private int     lastDirn;
-   private int     wallDirn;
    private boolean firstRun    = true;
 
    private boolean willAdvance = false;
-   private boolean adjustDirn  = false;
-   private int     sumTurns    = 0;
    private Point   startWalk;
 
    private boolean have_axe            = false;
@@ -71,8 +62,11 @@ public class Agent {
       //char action = PROMPT_USER;
       if (action == PROMPT_USER || numTurns > MAX_SEARCH) {
          // THE FOLLOWING FOR DEBUGGING ONLY:
-         System.out.println("Walk completed! Found:");
-         
+         if (numTurns > MAX_SEARCH) {
+            System.out.println("Max search moves exceeded!");
+         } else {
+            System.out.println("Walk completed! Found:");
+         }
          Point axe, gold, key;
          Vector<Point> dynamite;
          axe = map.getAxe();
@@ -140,7 +134,6 @@ public class Agent {
       if (firstRun) {
          // forwards isn't walkable, turn right.
          firstRun = false;
-         wallDirn = dirn;
          startWalk = new Point(currPoint.row, currPoint.col);
          return 'R';
       } else if (!willAdvance) {
