@@ -44,6 +44,7 @@ public class Agent {
 
    private boolean willAdvance = false;
    private boolean adjustDirn  = false;
+   private int     sumTurns    = 0;
    private Point   startWalk;
 
    private boolean have_axe            = false;
@@ -129,114 +130,51 @@ public class Agent {
     * Then turn and continue straight. 
     */
 
-   // walk around, remembering as much as possible of the map.
+   
+
    private char walk() {
       if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
          return 'F';
-      }
-
+      } 
+      // this needs a rethink. Left-hand wallfollowing with Pledge.
       if (firstRun) {
-         lastDirn = dirn;
-         wallDirn = dirn;
+         // forwards isn't walkable, turn right.
          firstRun = false;
+         wallDirn = dirn;
          startWalk = new Point(currPoint.row, currPoint.col);
          return 'R';
-      } else {
-         Point adjacentTile = map.getTileInDirection(wallDirn, currPoint);
-         if (isWalkable(adjacentTile) && !willAdvance) {
-            // wall is backLeft
-            Point frontLeft;
-            Point backLeft;
-            // apologies for this in advance
-            switch (dirn) {
-               case NORTH:
-                  frontLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
-                  backLeft = map.getTileInDirection(map.SOUTH_WEST, currPoint);
-                  break;
-               case SOUTH:
-                  frontLeft = map.getTileInDirection(map.SOUTH_EAST, currPoint);
-                  backLeft = map.getTileInDirection(map.NORTH_EAST, currPoint);
-                  break;
-               case EAST:
-                  frontLeft = map.getTileInDirection(map.NORTH_EAST, currPoint);
-                  backLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
-                  break;
-               case WEST:
-                  frontLeft = map.getTileInDirection(map.NORTH_WEST, currPoint);
-                  backLeft = map.getTileInDirection(map.NORTH_EAST, currPoint);
-                  break;
-               default:
-                  frontLeft = null;
-                  backLeft = null;
-            }
-
-            if (!isWalkable(backLeft)) {
-               wallDirn = wallDirn + 1;
-               wallDirn = wallDirn % 4;
-               adjustDirn = true;
-               willAdvance = true;
-               return 'L';
-            }
-            if (!isWalkable(frontLeft) && isWalkable(map.getTileInDirection(dirn, currPoint))) {
-               // go forwards
-               wallDirn = dirn + 1;
-               wallDirn = wallDirn % 4;
-               return 'F';
-            }
-            
-            // first turn towards it, and update wall direction. 
-            if ((dirn < lastDirn) || (dirn == SOUTH && lastDirn == EAST)) {
-               wallDirn = dirn + 1;
-               wallDirn = wallDirn % 4;
-               return 'L';
-            } else if ((dirn > lastDirn) || (dirn == EAST && lastDirn == SOUTH)) {
-               wallDirn = dirn - 1;
-               wallDirn = wallDirn % 4;
-               return 'R';
-            } else {
-               willAdvance = true;
-            }
-         } else if (!isWalkable(adjacentTile) && 
-            !isWalkable(map.getTileInDirection(dirn, currPoint))) {
-            // wall present and ahead blocked
-            // must change direction, wall is previous direction
-            wallDirn = dirn;
-            lastDirn = dirn;
-            return 'R';
-         } else if (!isWalkable(adjacentTile) && isWalkable(map.getTileInDirection(dirn, currPoint))) {
-            wallDirn = dirn + 1;
-            wallDirn = wallDirn % 4;
+      } else if (!willAdvance) {
+         // this is where the wall following happens
+         // ensure wall is to the left
+         Point adjacent = map.getTileInDirection(getDirectionFromTurn('L'), currPoint);
+         Point next = map.getTileInDirection(dirn, currPoint);
+         if (isWalkable(adjacent)) {
+            // turn towards and advance.
             willAdvance = true;
+            return 'L';
          }
-      }
-      if (willAdvance) {
-         // if next action is to advance, check whether we've done a full loop.
-         // if so, stop looping around coast (and willadvance = false.)
-         // if not, advance (and willadvance = false.)
-         Point nextTile = map.getTileInDirection(dirn, currPoint);
-         Point leftTile = map.getTileInDirection(wallDirn, currPoint);
-         if (nextTile.row == startWalk.row && nextTile.col == startWalk.col) {
-            if (leftTile.value != '~' && isWalkable(nextTile)) {
-               firstRun = true;
-               return 'F';
-            } else {
-               willAdvance = false;
-               return PROMPT_USER;
-            }
-         } else {
-            if (adjustDirn) {
-               // coming around edge
-               int wall = (dirn + 1) % 4;
-               Point left = map.getTileInDirection(wall, currPoint);
-               if (!isWalkable(left)) {
-                  wallDirn = wall;
-               }
-            }
-            willAdvance = false;
+         if (!isWalkable(adjacent) && isWalkable(next)) {
+            // wall present on left, can advance => advance
             return 'F';
          }
+         if (!isWalkable(adjacent) && !isWalkable(next)) {
+            // must make a right turn to keep wall on left.
+            return 'R';
+         }
       }
-      return PROMPT_USER;
+      if (willAdvance && isWalkable(map.getTileInDirection(dirn, currPoint))) {
+         willAdvance = false;
+         return 'F';
+      }
+      return 'X';
+   }
+
+   private int getDirectionFromTurn(char turnDirection) {
+      if (turnDirection == 'L') {
+         return (dirn + 1) % 4;
+      } else {
+         return (dirn - 1) % 4;
+      }
    }
 
    private boolean isWalkable(Point p) {
@@ -258,7 +196,7 @@ public class Agent {
       int nextDirn;
       while (i.hasNext()) {
          int currentDirection = dirn;
-         nextDirn = map.getDirection(i.next());
+         nextDirn = map.getDirection(i.next(), currPoint);
          if (nextDirn < map.NORTH_EAST) {
             // one of four cardinal directions, easy. 
             while (currentDirection != nextDirn) {

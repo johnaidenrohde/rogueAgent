@@ -194,9 +194,8 @@ public class Map {
 			} else if (fCol == tCol + 1) {
 				return SOUTH_WEST;
 			}
-		} else {
-			return -1;
 		}
+		return -1;
 	}
 
 	public Vector<Point> findGroupsX () {
