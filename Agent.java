@@ -249,6 +249,47 @@ public class Agent {
       }
    }
 
+   // translate a vector of points into a list of moves
+   private LinkedList getMoves(Vector<Point> p) {
+      LinkedList list = new LinkedList();
+      Iterator<Point> i = p.iterator();
+      // needs to consider agent direction at each point as well as 
+      // absolute direction.
+      int nextDirn;
+      while (i.hasNext()) {
+         int currentDirection = dirn;
+         nextDirn = map.getDirection(i.next());
+         if (nextDirn < map.NORTH_EAST) {
+            // one of four cardinal directions, easy. 
+            while (currentDirection != nextDirn) {
+               // turn left until we're facing the right way
+               list.add('L');
+               currentDirection = (currentDirection + 1) % 4;
+            }
+            list.add('F');
+         } else {
+            /****************************************
+             * ASSUMING NO DIAGONALS, FIX OTHERWISE *
+             ****************************************
+
+            // one of four "halfway" directions, requires some Manhattan traversal
+            // two choices - change row first or change col first. 
+            switch (nextDirn) {
+               case map.NORTH_EAST:
+                  break;
+               case map.NORTH_WEST:
+                  break;
+               case map.SOUTH_EAST:
+                  break;
+               case map.SOUTH_WEST:
+                  break;
+            }
+            */
+         }
+      }
+      return list;
+   }
+
    void print_view(char view[][] )
    {
       int i,j;

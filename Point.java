@@ -35,7 +35,7 @@ public class Point {
 		dirn = NORTH;
 	}
 
-   public setParent (Point parent){
+   public void setParent (Point parent){
       this.parent = parent;
    }
 }

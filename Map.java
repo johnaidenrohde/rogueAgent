@@ -159,6 +159,46 @@ public class Map {
 		return false;
 	}
 
+	public int getDirection(Point from, Point to) {
+		// must be adjacent
+		if (!isAdjacentTo(from, to)) {
+			return -1;
+		}
+		int fRow, fCol;
+		int tRow, tCol;
+		fRow = from.row;
+		fCol = from.col;
+		tRow = to.row;
+		tCol = to.col;
+		if (fRow = tRow - 1) {
+			if (fCol == tCol) {
+				return NORTH;
+			} else if (fCol = tCol - 1) {
+				return NORTH_EAST;
+			} else if (fCol = tCol + 1) {
+				return NORTH_WEST;
+			}
+		} else if (fRow == tRow) {
+			if (fCol = tCol - 1) {
+				return EAST;
+			} else if (fCol = tCol + 1) {
+				return WEST;
+			} else {
+				return -1;
+			}
+		} else if (fRow = tRow + 1) {
+			if (fCol == tCol) {
+				return SOUTH;
+			} else if (fCol = tCol - 1) {
+				return SOUTH_EAST;
+			} else if (fCol = tCol + 1) {
+				return SOUTH_WEST;
+			}
+		} else {
+			return -1;
+		}
+	}
+
 	public Vector<Point> findGroupsX () {
 		// Vector of points, each point is center of first line of X group.
 		Vector<Point> x = new Vector<Point>();
