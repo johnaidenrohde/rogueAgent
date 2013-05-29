@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.Vector;
+import java.io.*;
 
 /*
  * Class to implement pathfinding from one point on the map to another.
@@ -50,6 +51,7 @@ public class Astar
       curr.setG(0);
       openSet.add(curr);
 
+
       while( openSet.peek() != null ){
 
          curr = openSet.poll();
@@ -62,7 +64,7 @@ public class Astar
          closedSet.add(curr);
 
          //For each neighbor node
-         for(int i = 4; i >= 0; i = i+1){
+         for(int i = 4; i >= 0; i = i - 1){
             neighbor = map.getTileInDirection(i, curr);
             // We only consider walkable nodes
             if(map.isWalkable(neighbor)){

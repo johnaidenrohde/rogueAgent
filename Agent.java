@@ -33,9 +33,10 @@ public class Agent {
    private Point   currPoint;
    private int     dirn;
 
-   // variable for path planning
+   // variable for planning
+   private int stage = 0;
    private LinkedList<Character> mission;
-   private boolean onMission;
+   private boolean onMission = false;
    private int missionStep;
 
    private boolean firstRun    = true;
@@ -53,7 +54,6 @@ public class Agent {
 
    private int     numTurns  = 0;
 
-   private int stage = 0;
 
 /*******************************************************************************
  * MAIN AI FUCNTION *
@@ -65,13 +65,12 @@ public class Agent {
       int ch=0;
       char action = PROMPT_USER;
 
-      //intially explore the map
-      if(stage == 0){
+      //intially explore the map for 200 turns
+      if(numTurns < 200){
          action = walk();
-         System.out.println("Still Walking!");
-      }
-      //Then work out what strategy we want to take
-      if(stage == 1){
+      }else{
+         //Then work out what strategy we want to take
+         System.out.println("Done Randomly Walking!");
          action = gamePlan();
       }
 
@@ -188,12 +187,17 @@ public class Agent {
    private char gamePlan(){
       if(onMission){
          //if we are currently walking a path just return the next character
-         return(mission.pollLast());
+         if(!mission.isEmpty()){
+            return(mission.pollLast());
+         }else{
+            onMission = false;
+         }
       }
+
       //If we still have unknown regions on the map we explore them
       Vector<Point> x = map.findGroupsX();
-      while(!(map.findGroupsX()).isEmpty()){
-         x = map.findGroupsX();
+      while(!x.isEmpty()){
+         onMission = true;
          for (int i = 0; i < x.size(); i++) {
             Point y = x.get(i);
             System.out.println("X group at: row="+y.row+", col="+y.col);
@@ -202,6 +206,7 @@ public class Agent {
          Astar pathFinder = new Astar();
          //Chart a path to the group of X's
          x = pathFinder.findPath(currPoint, x.get(0), map);
+         System.out.println("The path contains " + x.size() + " points");
          if(x == null){
             System.out.println("No path found!");
          }else{
@@ -209,6 +214,7 @@ public class Agent {
             mission = getMoves(x);
             return(mission.pollLast());
          }
+         x = map.findGroupsX();
       }
       // If there is nothing left to do
       return(PROMPT_USER);
@@ -216,22 +222,45 @@ public class Agent {
 
    // translate a vector of points into a list of moves
    private LinkedList<Character> getMoves(Vector <Point> p) {
+
       LinkedList<Character> list = new LinkedList<Character>();
-      Iterator<Point> i = p.iterator();
-      // needs to consider agent direction at each point as well as
-      // absolute direction.
-      int nextDirn;
-      while (i.hasNext()) {
-         int currentDirection = dirn;
-         nextDirn = map.getDirection(i.next(), currPoint);
-         if (nextDirn < map.NORTH_EAST) {
-            // one of four cardinal directions, easy.
-            while (currentDirection != nextDirn) {
-               // turn left until we're facing the right way
+      Point currentPoint, previousPoint;
+      int index = p.size() - 1;
+      int nextDirection = NORTH;
+      int dRow, dCol;
+      int currentDirection = dirn;
+
+      previousPoint = currPoint;
+      System.out.println("currPoint = [" + currPoint.row + "," +
+               currPoint.col + "]");
+      while (!p.isEmpty()) {
+         // given vector is actaully in reverse
+         currentPoint = p.remove(index);
+         System.out.println("Point to add = [" + currentPoint.row + "," +
+               currentPoint.col + "]");
+         dRow = previousPoint.row - currentPoint.row;
+         dCol = previousPoint.col - currentPoint.col;
+         // check that the square is adjacent
+         if(Math.abs(dRow + dCol) != 1){
+            System.out.println("Something fishy going on here");
+         }else{
+            if(dRow == -1){ // to the left
+               nextDirection = WEST;
+            }else if( dRow == 1 ){ // to the right
+               nextDirection = EAST;
+            }else if( dCol == -1 ){ // below us
+               nextDirection = SOUTH;
+            }else if( dCol == 1 ){ //above us
+               nextDirection = NORTH;
+            }
+            while( nextDirection != currentDirection){
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             }
             list.add('F');
+            index = index - 1;
+            previousPoint = currentPoint;
+            currentPoint = p.remove(index);
          }
       }
       return list;

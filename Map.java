@@ -163,7 +163,7 @@ public class Map {
 		dCol = p.col - curr.col;
 		dRow *= dRow;
 		dCol *= dCol;
-		if (dRow < 1 && dCol < 1) {
+		if (dRow <= 1 && dRow >= -1 && dCol <= 1 && dCol >= -1) {
 			return true;
 		}
 		return false;
