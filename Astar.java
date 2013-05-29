@@ -64,22 +64,26 @@ public class Astar
          //For each neighbor node
          for(int i = 4; i >= 0; i = i+1){
             neighbor = map.getTileInDirection(i, curr);
-            //The total length of the path to each neighbor node
-            cost = neighbor.g + 1;
-            //Remove this neighbor because the current path is better
-            if((openSet.contains(neighbor))&&(cost < neighbor.g)){
-               openSet.remove(neighbor);
-            }
-            //Shouldn't happen too often
-            if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
-               closedSet.remove(neighbor);
-            }
-            //If we haven't considered this square it yet
-            if(!(closedSet.contains(neighbor))&& !(openSet.contains(neighbor))){
-               neighbor.setG(cost);
-               neighbor.setF(manDistance(neighbor, goal) + cost);
+            // We only consider walkable nodes
+            if(map.isWalkable(neighbor)){
+               //The total length of the path to each neighbor node
+               cost = neighbor.g + 1;
+               //Remove this neighbor because the current path is better
+               if((openSet.contains(neighbor))&&(cost < neighbor.g)){
+                  openSet.remove(neighbor);
+               }
+               //Shouldn't happen too often
+               if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
+                  closedSet.remove(neighbor);
+               }
+               //If we haven't considered this square it yet
+               if(!(closedSet.contains(neighbor))&& !(openSet.contains(neighbor))){
+                  neighbor.setG(cost);
+                  neighbor.setF(manDistance(neighbor, goal) + cost);
                neighbor.setParent(curr);
                openSet.add(neighbor);
+               }
+
             }
          }
       }

@@ -5,52 +5,66 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
 Agent	Agent.java	/^public class Agent {$/;"	c
-COL	Agent.java	/^   final static int COL    = 1;$/;"	f	class:Agent
+Astar	Astar.java	/^public class Astar$/;"	c
 EAST	Agent.java	/^   final static int EAST   = 0;$/;"	f	class:Agent
 EAST	Map.java	/^	final static int EAST   = 0;$/;"	f	class:Map
 EAST	Point.java	/^	final static int EAST   = 0;$/;"	f	class:Point
 EAST	Rogue.java	/^   final static int EAST   = 0;$/;"	f	class:Rogue
+MAX_SEARCH	Agent.java	/^   final static int MAX_SEARCH = 500;$/;"	f	class:Agent
 Map	Map.java	/^	public Map (int rows, int cols) {$/;"	m	class:Map
 Map	Map.java	/^	public Map (int rows, int cols, char initialValue) {$/;"	m	class:Map
 Map	Map.java	/^public class Map {$/;"	c
 NORTH	Agent.java	/^   final static int NORTH  = 1;$/;"	f	class:Agent
 NORTH	Map.java	/^   	final static int NORTH  = 1;$/;"	f	class:Map
-NORTH	Point.java	/^   	final static int NORTH  = 1;$/;"	f	class:Point
+NORTH	Point.java	/^   final static int NORTH  = 1;$/;"	f	class:Point
 NORTH	Rogue.java	/^   final static int NORTH  = 1;$/;"	f	class:Rogue
+NORTH_EAST	Map.java	/^   	final static int NORTH_EAST = 4;$/;"	f	class:Map
+NORTH_WEST	Map.java	/^   	final static int NORTH_WEST = 7;$/;"	f	class:Map
 PROMPT_USER	Agent.java	/^   final static char PROMPT_USER = 'X';$/;"	f	class:Agent
 Point	Point.java	/^	public Point (int row, int col) {$/;"	m	class:Point
 Point	Point.java	/^	public Point (int row, int col, char value) {$/;"	m	class:Point
+Point	Point.java	/^   public Point (int row, int col, Point parent) {$/;"	m	class:Point
 Point	Point.java	/^public class Point {$/;"	c
-ROW	Agent.java	/^   final static int ROW    = 0;$/;"	f	class:Agent
+PointComparator	PointComparator.java	/^public class PointComparator implements Comparator<Point>$/;"	c
 Rogue	Rogue.java	/^public class Rogue {$/;"	c
 SOUTH	Agent.java	/^   final static int SOUTH  = 3;$/;"	f	class:Agent
 SOUTH	Map.java	/^   	final static int SOUTH  = 3;$/;"	f	class:Map
-SOUTH	Point.java	/^   	final static int SOUTH  = 3;$/;"	f	class:Point
+SOUTH	Point.java	/^   final static int SOUTH  = 3;$/;"	f	class:Point
 SOUTH	Rogue.java	/^   final static int SOUTH  = 3;$/;"	f	class:Rogue
+SOUTH_EAST	Map.java	/^   	final static int SOUTH_EAST = 5;$/;"	f	class:Map
+SOUTH_WEST	Map.java	/^   	final static int SOUTH_WEST = 6;$/;"	f	class:Map
 UNVISITED	Map.java	/^	public static final char UNVISITED = 'X';$/;"	f	class:Map
 WEST	Agent.java	/^   final static int WEST   = 2;$/;"	f	class:Agent
 WEST	Map.java	/^   	final static int WEST   = 2;$/;"	f	class:Map
-WEST	Point.java	/^   	final static int WEST   = 2;$/;"	f	class:Point
+WEST	Point.java	/^   final static int WEST   = 2;$/;"	f	class:Point
 WEST	Rogue.java	/^   final static int WEST   = 2;$/;"	f	class:Rogue
 apply	Rogue.java	/^   private boolean apply( char action )$/;"	m	class:Rogue	file:
 axe	Map.java	/^	private Point   axe = null;$/;"	f	class:Map	file:
 col	Point.java	/^	public int col;$/;"	f	class:Point
 col	Rogue.java	/^   private int row,col,dirn;$/;"	f	class:Rogue	file:
+compare	PointComparator.java	/^    public int compare(Point x, Point y)$/;"	m	class:PointComparator
 currPoint	Agent.java	/^   private Point   currPoint;$/;"	f	class:Agent	file:
 dirn	Agent.java	/^   private int     dirn;$/;"	f	class:Agent	file:
 dirn	Point.java	/^	public int dirn;$/;"	f	class:Point
 dirn	Rogue.java	/^   private int row,col,dirn;$/;"	f	class:Rogue	file:
 dynamite	Map.java	/^	private Vector<Point> dynamite = new Vector<Point>();$/;"	f	class:Map	file:
-firstRun	Agent.java	/^   private boolean firstRun = true;$/;"	f	class:Agent	file:
-followCoast	Agent.java	/^   private char followCoast() {$/;"	m	class:Agent	file:
+f	Point.java	/^   public int f;$/;"	f	class:Point
+findGroupsX	Map.java	/^	public Vector<Point> findGroupsX () {$/;"	m	class:Map
+findPath	Astar.java	/^   public Vector<Point> findPath( Point start, Point goal, Map map ){$/;"	m	class:Astar
+firstRun	Agent.java	/^   private boolean firstRun    = true;$/;"	f	class:Agent	file:
+g	Point.java	/^   public int g;$/;"	f	class:Point
+gamePlan	Agent.java	/^   private char gamePlan(){$/;"	m	class:Agent	file:
 game_lost	Agent.java	/^   private boolean game_lost = false;$/;"	f	class:Agent	file:
 game_lost	Rogue.java	/^   private boolean game_lost = false;$/;"	f	class:Rogue	file:
 game_won	Agent.java	/^   private boolean game_won  = false;$/;"	f	class:Agent	file:
 game_won	Rogue.java	/^   private boolean game_won  = false;$/;"	f	class:Rogue	file:
 getAxe	Map.java	/^	public Point getAxe() {$/;"	m	class:Map
+getDirection	Map.java	/^	public int getDirection(Point from, Point to) {$/;"	m	class:Map
+getDirectionFromTurn	Agent.java	/^   private int getDirectionFromTurn(char turnDirection) {$/;"	m	class:Agent	file:
 getDynamite	Map.java	/^	public Vector<Point> getDynamite() {$/;"	m	class:Map
 getGold	Map.java	/^	public Point getGold() {$/;"	m	class:Map
 getKey	Map.java	/^	public Point getKey() {$/;"	m	class:Map
+getMoves	Agent.java	/^   private Vector<Character> getMoves(Vector<Point> p) {$/;"	m	class:Agent	file:
 getTileInDirection	Map.java	/^	public Point getTileInDirection(int direction, Point currPoint) {$/;"	m	class:Map
 getTileWithLocation	Map.java	/^	public Point getTileWithLocation(Point location) {$/;"	m	class:Map
 getTileWithLocation	Map.java	/^	public Point getTileWithLocation(int row, int col) {$/;"	m	class:Map
@@ -66,20 +80,22 @@ have_key	Rogue.java	/^   private boolean have_key  = false;$/;"	f	class:Rogue	fi
 icol	Rogue.java	/^   private int irow,icol; \/\/ initial row and column$/;"	f	class:Rogue	file:
 init_world	Agent.java	/^   private void init_world(char view[][] ) {$/;"	m	class:Agent	file:
 irow	Rogue.java	/^   private int irow,icol; \/\/ initial row and column$/;"	f	class:Rogue	file:
-isWalkable	Agent.java	/^   private boolean isWalkable(Point p) {$/;"	m	class:Agent	file:
-isWalkable	Agent.java	/^   private boolean isWalkable(char tile) {$/;"	m	class:Agent	file:
+isAdjacentTo	Map.java	/^	public boolean isAdjacentTo(Point p, Point curr) {$/;"	m	class:Map
+isWalkable	Map.java	/^   public boolean isWalkable(Point p) {$/;"	m	class:Map
 key	Map.java	/^	private Point   key = null;$/;"	f	class:Map	file:
-lastDirn	Agent.java	/^   private int     lastDirn;$/;"	f	class:Agent	file:
 main	Agent.java	/^   public static void main( String[] args ){$/;"	m	class:Agent
 main	Rogue.java	/^   public static void main( String[] args )$/;"	m	class:Rogue
-map	Agent.java	/^   private Map map;$/;"	f	class:Agent	file:
+manDistance	Astar.java	/^   private int manDistance(Point curr, Point goal){$/;"	m	class:Astar	file:
+map	Agent.java	/^   private Map     map;$/;"	f	class:Agent	file:
 map	Map.java	/^	private char[][] map;$/;"	f	class:Map	file:
 map	Rogue.java	/^   private char[][] map;$/;"	f	class:Rogue	file:
 nrows	Rogue.java	/^   private int nrows;     \/\/ number of rows in environment$/;"	f	class:Rogue	file:
 numCols	Map.java	/^	public int numRows, numCols;$/;"	f	class:Map
 numRows	Map.java	/^	public int numRows, numCols;$/;"	f	class:Map
+numTurns	Agent.java	/^   private int     numTurns  = 0;$/;"	f	class:Agent	file:
 num_dynamites_held	Agent.java	/^   private int     num_dynamites_held  = 0;$/;"	f	class:Agent	file:
 num_dynamites_held	Rogue.java	/^   private int num_dynamites_held = 0;$/;"	f	class:Rogue	file:
+parent	Point.java	/^   public Point parent;$/;"	f	class:Point
 printMap	Map.java	/^	public void printMap (Point currPoint) {$/;"	m	class:Map
 printUsage	Rogue.java	/^   private static void printUsage()$/;"	m	class:Rogue	file:
 print_map	Rogue.java	/^   private void print_map() {$/;"	m	class:Rogue	file:
@@ -87,13 +103,18 @@ print_view	Agent.java	/^   void print_view(char view[][] )$/;"	m	class:Agent
 read_map	Rogue.java	/^   private void read_map( String mapName ) {$/;"	m	class:Rogue	file:
 row	Point.java	/^	public int row;$/;"	f	class:Point
 row	Rogue.java	/^   private int row,col,dirn;$/;"	f	class:Rogue	file:
+setF	Point.java	/^   public void setF (int f){$/;"	m	class:Point
+setG	Point.java	/^   public void setG (int g){$/;"	m	class:Point
+setParent	Point.java	/^   public void setParent (Point parent){$/;"	m	class:Point
 setTile	Map.java	/^	public void setTile(Point location) {$/;"	m	class:Map
+stage	Agent.java	/^   private int stage = 0;$/;"	f	class:Agent	file:
 startPoint	Agent.java	/^   private Point   startPoint;$/;"	f	class:Agent	file:
 startWalk	Agent.java	/^   private Point   startWalk;$/;"	f	class:Agent	file:
 swanSong	Rogue.java	/^   private static void swanSong( String message ) {$/;"	m	class:Rogue	file:
+tracePath	Astar.java	/^   private Vector<Point> tracePath( Point toFollow  ){$/;"	m	class:Astar	file:
 updateMap	Map.java	/^	public void updateMap(char view[][], Point currPoint) {$/;"	m	class:Map
 update_world	Agent.java	/^   private boolean update_world( char action, char view[][] ){$/;"	m	class:Agent	file:
 value	Point.java	/^	public char value;$/;"	f	class:Point
 view	Rogue.java	/^   private char[][] view;$/;"	f	class:Rogue	file:
-walkAround	Agent.java	/^   private char walkAround() {$/;"	m	class:Agent	file:
+walk	Agent.java	/^   private char walk() {$/;"	m	class:Agent	file:
 willAdvance	Agent.java	/^   private boolean willAdvance = false;$/;"	f	class:Agent	file:

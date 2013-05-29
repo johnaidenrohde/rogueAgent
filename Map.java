@@ -4,7 +4,7 @@ import java.util.*;
 public class Map {
 
 	public static final char UNVISITED = 'X';
-	
+
 	final static int EAST   = 0;
    	final static int NORTH  = 1;
    	final static int WEST   = 2;
@@ -69,15 +69,15 @@ public class Map {
 	            else {
 	            	ch = map[r][c];
 	            }
-	            //if (ch != 'X') {
+	            if (ch != 'X') {
 	            	System.out.print( ch );
 	            	interestingLine = true;
-	            //}
+	            }
         	}
-        	//if (interestingLine) {
+        	if (interestingLine) {
         		System.out.println();
         		interestingLine = false;
-        	//}
+        	}
     	}
 
     	System.out.println();
@@ -117,13 +117,13 @@ public class Map {
 		int d_row = 0; int d_col = 0;
 		int new_row = 0; int new_col = 0;
 		switch (direction) {
-			case NORTH: 
+			case NORTH:
 			d_row = -1; break;
-			case SOUTH: 
+			case SOUTH:
 			d_row =  1; break;
-			case EAST:  
+			case EAST:
 			d_col =  1; break;
-			case WEST:  
+			case WEST:
 			d_col = -1; break;
 			case NORTH_EAST:
 			d_row = -1;
@@ -146,6 +146,16 @@ public class Map {
 		Point tile = new Point(new_row, new_col, ch);
 		return tile;
 	}
+
+   public boolean isWalkable(Point p) {
+      char tile = p.value;
+      switch(tile) {
+         case '*': case 'T': case '-': case '~':
+         return false;
+         default:
+         return true;
+      }
+   }
 
 	public boolean isAdjacentTo(Point p, Point curr) {
 		int dRow, dCol;
@@ -220,11 +230,11 @@ public class Map {
 					centreXs = startX+(j - startX);
 					Point p = new Point(i, centreXs);
 					x.add(p);
-					// reset startX 
+					// reset startX
 					startX = -1;
 				}
 			} // finished scanning line
-			
+
 		}
 		return x;
 	}
