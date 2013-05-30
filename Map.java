@@ -56,7 +56,8 @@ public class Map {
 		int r,c;
 		boolean interestingLine = false;
 		System.out.println("\n");
-		for( r=0; r < 200; r++ ) {
+		for( r=75; r < 125; r++ ) {
+			System.out.print( r + " ");
 			for( c=0; c < map[r].length; c++ ) {
 	            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
 	            	switch( currPoint.dirn ) {
@@ -69,15 +70,15 @@ public class Map {
 	            else {
 	            	ch = map[r][c];
 	            }
-	            if (ch != 'X') {
-	            	System.out.print( ch );
+	            //if (ch != 'X') {
+	          		System.out.print( ch );
 	            	interestingLine = true;
-	            }
+	            //}
         	}
-        	if (interestingLine) {
+        	//if (interestingLine) {
         		System.out.println();
         		interestingLine = false;
-        	}
+        	//}
     	}
 
     	System.out.println();

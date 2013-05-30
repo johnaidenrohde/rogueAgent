@@ -55,6 +55,8 @@ public class Astar
       while( openSet.peek() != null ){
 
          curr = openSet.poll();
+         //System.out.println ("Considering point " + curr.row + ","
+           //             + curr.col);
 
          //If we have arrived at the goal
          if((curr.row == goal.row) && (curr.col == goal.col)){
@@ -83,8 +85,8 @@ public class Astar
                   neighbor.setF(manDistance(neighbor, goal) + cost);
                   neighbor.setParent(curr);
                   openSet.add(neighbor);
-                  System.out.println ("Added Neighbor " + neighbor.row + ","
-                        + neighbor.col);
+                  //System.out.println ("Added Neighbor " + neighbor.row + ","
+                 //       + neighbor.col);
                }
             }
          }
@@ -103,6 +105,8 @@ public class Astar
    private Vector<Point> tracePath( Point toFollow  ){
       Vector<Point> toReturn = new Vector<Point>(640);
       while(toFollow.parent != null){
+        System.out.println("Tracepath: "+ toFollow.row + ","
+                                + toFollow.col);
          toReturn.add(toFollow);
          toFollow = toFollow.parent;
       }

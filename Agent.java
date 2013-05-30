@@ -66,11 +66,10 @@ public class Agent {
       char action = PROMPT_USER;
 
       //intially explore the map for 200 turns
-      if(numTurns < 200){
+      if(numTurns < 201){
          action = walk();
       }else{
          //Then work out what strategy we want to take
-         System.out.println("Done Randomly Walking!");
          action = gamePlan();
       }
 
@@ -188,7 +187,7 @@ public class Agent {
       if(onMission){
          //if we are currently walking a path just return the next character
          if(!mission.isEmpty()){
-            return(mission.pollLast());
+            return(mission.poll());
          }else{
             onMission = false;
          }
@@ -212,7 +211,8 @@ public class Agent {
          }else{
             //get a plan from the returned set of points
             mission = getMoves(x);
-            return(mission.pollLast());
+            System.out.println("List of moves = " + mission.toString());
+            return(mission.poll());
          }
          x = map.findGroupsX();
       }
@@ -244,8 +244,9 @@ public class Agent {
          // check that the square is adjacent
          if(Math.abs(dRow + dCol) != 1){
             System.out.println("Something fishy going on here");
+            System.out.println("Problem point to add = [" + currentPoint.row + "," +
+               currentPoint.col + "]");
             previousPoint = currentPoint;
-            currentPoint = points.poll();
          }else{
             if(dRow == -1){ // to the left
                nextDirection = WEST;
@@ -262,7 +263,6 @@ public class Agent {
             }
             list.add('F');
             previousPoint = currentPoint;
-            currentPoint = points.poll();
          }
       }
       return list;
@@ -312,6 +312,7 @@ public class Agent {
       // make changes to direction only if dir'n changed
       if (( action == 'L' )||( action == 'l' )) {
          dirn = ( dirn + 1 ) % 4;
+         
          return( true );
       } else if (( action == 'R' )||( action == 'r' )) {
          dirn = ( dirn + 3 ) % 4;
@@ -427,6 +428,7 @@ public class Agent {
             agent.update_world( action, view ); //Update the map and other things
             //agent.print_view( view ); // COMMENT THIS OUT BEFORE SUBMISSION
             action = agent.get_action(view);
+            System.out.println("Making move: " + action);
             out.write( action );
          }
       }
