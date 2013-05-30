@@ -33,6 +33,11 @@ public class Agent {
    private Point   currPoint;
    private int     dirn;
 
+   // variable for path planning
+   private LinkedList<Character> mission;
+   private boolean onMission;
+   private int missionStep;
+
    private boolean firstRun    = true;
 
    private boolean willAdvance = false;
@@ -48,18 +53,29 @@ public class Agent {
 
    private int     numTurns  = 0;
 
+   private int stage = 0;
+
+/*******************************************************************************
+ * MAIN AI FUCNTION *
+ ******************************************************************************/
+
 
    public char get_action(char[][] view) {
 
       int ch=0;
+      char action = PROMPT_USER;
 
-      char action = walk();
-      Vector<Point> x = map.findGroupsX();
-      for (int i = 0; i < x.size(); i++) {
-         Point y = x.get(i);
-         System.out.println("X group at: row="+y.row+", col="+y.col);
+      //intially explore the map
+      if(stage == 0){
+         action = walk();
+         System.out.println("Still Walking!");
       }
-      //char action = PROMPT_USER;
+      //Then work out what strategy we want to take
+      if(stage == 1){
+         action = gamePlan();
+      }
+
+      //Otherwise prompt for input
       if (action == PROMPT_USER || numTurns > MAX_SEARCH) {
          // THE FOLLOWING FOR DEBUGGING ONLY:
          if (numTurns > MAX_SEARCH) {
@@ -79,6 +95,7 @@ public class Agent {
          }
          if (gold != null) {
             System.out.println("Gold at row:" + gold.row + " col:" + gold.col);
+
          }
          if (key != null) {
             System.out.println("Key at row:" + key.row + " col:" + key.col);
@@ -86,7 +103,7 @@ public class Agent {
          if (dynamite != null) {
             System.out.println("Last dynamite at row:" + dynamite.lastElement().row + " col:" + dynamite.lastElement().col);
          }
-         // END DEBUGGING  
+         // END DEBUGGING
 
          System.out.print("Enter Action(s): ");
          try {
@@ -106,30 +123,22 @@ public class Agent {
             System.out.println ("IO error:" + e );
          }
       }
-      numTurns++;
+      numTurns = numTurns + 1;
       return action;
    }
 
-   /* A* with limited visibility. To execute, need a couple of data structures:
-    * OPEN list can be represented as a Priority Queue
-    * CLOSED list could be a HashMap (to maybe speed up checking) or simple Vector
+/*******************************************************************************
+ * EXPLORATION AND HELPER FUNCTIONS *
+ ******************************************************************************/
+
+   /*
+    * If nothing obvious available, continue on current path until an obstacle is encountered.
+    * Then turn and continue straight.
     */
-
-   /* The hard part here is choosing a good heuristic, especially since most of the
-    * map won't be immediately visible. Maybe prioritise exploration unless a tool
-    * is easily reachable or an obstacle is surmountable. Wrong usage of dynamite is
-    * especially fatal to getting a good solution.
-    *
-    * If nothing obvious available, continue on current path until an obstacle is encountered. 
-    * Then turn and continue straight. 
-    */
-
-   
-
    private char walk() {
-      if (firstRun && isWalkable(map.getTileInDirection(dirn, currPoint))) {
+      if (firstRun && map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
          return 'F';
-      } 
+      }
       // this needs a rethink. Left-hand wallfollowing with Pledge.
       if (firstRun) {
          // forwards isn't walkable, turn right.
@@ -141,25 +150,26 @@ public class Agent {
          // ensure wall is to the left
          Point adjacent = map.getTileInDirection(getDirectionFromTurn('L'), currPoint);
          Point next = map.getTileInDirection(dirn, currPoint);
-         if (isWalkable(adjacent)) {
-            // turn towards and advance.
+         if (map.isWalkable(adjacent)) {
+            // turn)towards and advance.
             willAdvance = true;
             return 'L';
          }
-         if (!isWalkable(adjacent) && isWalkable(next)) {
+         if (!map.isWalkable(adjacent) && map.isWalkable(next)) {
             // wall present on left, can advance => advance
             return 'F';
          }
-         if (!isWalkable(adjacent) && !isWalkable(next)) {
+         if (!map.isWalkable(adjacent) && !map.isWalkable(next)) {
             // must make a right turn to keep wall on left.
             return 'R';
          }
       }
-      if (willAdvance && isWalkable(map.getTileInDirection(dirn, currPoint))) {
+      if (willAdvance && map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
          willAdvance = false;
          return 'F';
       }
-      return 'X';
+      stage = 1;
+      return PROMPT_USER;
    }
 
    private int getDirectionFromTurn(char turnDirection) {
@@ -170,56 +180,66 @@ public class Agent {
       }
    }
 
-   private boolean isWalkable(Point p) {
-      char tile = p.value;
-      switch(tile) {
-         case '*': case 'T': case '-': case '~':
-         return false;
-         default:
-         return true;
+/*******************************************************************************
+ * GAME PLAYING LOGIC AND HELPER FUNCTIONS *
+ ******************************************************************************/
+
+
+   private char gamePlan(){
+      if(onMission){
+         //if we are currently walking a path just return the next character
+         return(mission.pollLast());
       }
+      //If we still have unknown regions on the map we explore them
+      Vector<Point> x = map.findGroupsX();
+      while(!(map.findGroupsX()).isEmpty()){
+         x = map.findGroupsX();
+         for (int i = 0; i < x.size(); i++) {
+            Point y = x.get(i);
+            System.out.println("X group at: row="+y.row+", col="+y.col);
+         }
+         //create the pathFinder
+         Astar pathFinder = new Astar();
+         //Chart a path to the group of X's
+         x = pathFinder.findPath(currPoint, x.get(0), map);
+         if(x == null){
+            System.out.println("No path found!");
+         }else{
+            //get a plan from the returned set of points
+            mission = getMoves(x);
+            return(mission.pollLast());
+         }
+      }
+      // If there is nothing left to do
+      return(PROMPT_USER);
    }
 
    // translate a vector of points into a list of moves
-   private LinkedList getMoves(Vector<Point> p) {
-      LinkedList list = new LinkedList();
+   private LinkedList<Character> getMoves(Vector <Point> p) {
+      LinkedList<Character> list = new LinkedList<Character>();
       Iterator<Point> i = p.iterator();
-      // needs to consider agent direction at each point as well as 
+      // needs to consider agent direction at each point as well as
       // absolute direction.
       int nextDirn;
       while (i.hasNext()) {
          int currentDirection = dirn;
          nextDirn = map.getDirection(i.next(), currPoint);
          if (nextDirn < map.NORTH_EAST) {
-            // one of four cardinal directions, easy. 
+            // one of four cardinal directions, easy.
             while (currentDirection != nextDirn) {
                // turn left until we're facing the right way
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             }
             list.add('F');
-         } else {
-            /****************************************
-             * ASSUMING NO DIAGONALS, FIX OTHERWISE *
-             ****************************************
-
-            // one of four "halfway" directions, requires some Manhattan traversal
-            // two choices - change row first or change col first. 
-            switch (nextDirn) {
-               case map.NORTH_EAST:
-                  break;
-               case map.NORTH_WEST:
-                  break;
-               case map.SOUTH_EAST:
-                  break;
-               case map.SOUTH_WEST:
-                  break;
-            }
-            */
          }
       }
       return list;
    }
+
+/*******************************************************************************
+ * GENERAL HELPER FUNCTIONS *
+ ******************************************************************************/
 
    void print_view(char view[][] )
    {
@@ -265,7 +285,7 @@ public class Agent {
       } else if (( action == 'R' )||( action == 'r' )) {
          dirn = ( dirn + 3 ) % 4;
          return( true );
-      } else { 
+      } else {
          // if direction not changed, look ahead 1 space to see what's there
          p = map.getTileInDirection(dirn, currPoint);
          ch = p.value;
@@ -285,15 +305,15 @@ public class Agent {
          map.setTile(new Point(currPoint.row, currPoint.col, ' ')); // clear new location
 
          switch( ch ) {
-            case 'a': 
+            case 'a':
             have_axe  = true;     break;
-            case 'k': 
+            case 'k':
             have_key  = true;     break;
-            case 'g': 
+            case 'g':
             have_gold = true;     break;
-            case 'd': 
+            case 'd':
             num_dynamites_held++; break;
-            case '~': 
+            case '~':
             game_lost = true;     break;
          }
          if( have_gold &&( currPoint.row == startPoint.row )&&( currPoint.col == startPoint.col )) {
@@ -310,6 +330,10 @@ public class Agent {
    }
 
 
+/*******************************************************************************
+ * INITIAL GAME SETUP AND OVERALL GAME LOOP *
+ ******************************************************************************/
+
    //Perform the inital setup of the agent and the world map
    private void init_world(char view[][] ) {
 
@@ -322,7 +346,7 @@ public class Agent {
 
       //Initialize the map
       map = new Map(200,200,Map.UNVISITED);
-      
+
       map.updateMap(view, currPoint);
    }
 
@@ -370,7 +394,7 @@ public class Agent {
                }
             }
             agent.update_world( action, view ); //Update the map and other things
-            agent.print_view( view ); // COMMENT THIS OUT BEFORE SUBMISSION
+            //agent.print_view( view ); // COMMENT THIS OUT BEFORE SUBMISSION
             action = agent.get_action(view);
             out.write( action );
          }
