@@ -222,10 +222,11 @@ public class Agent {
 
    // translate a vector of points into a list of moves
    private LinkedList<Character> getMoves(Vector <Point> p) {
+      LinkedList<Point> points = new LinkedList<Point>(p);
+      Collections.reverse(points);
 
       LinkedList<Character> list = new LinkedList<Character>();
       Point currentPoint, previousPoint;
-      int index = p.size() - 1;
       int nextDirection = NORTH;
       int dRow, dCol;
       int currentDirection = dirn;
@@ -233,9 +234,9 @@ public class Agent {
       previousPoint = currPoint;
       System.out.println("currPoint = [" + currPoint.row + "," +
                currPoint.col + "]");
-      while (!p.isEmpty()) {
+      while (!points.isEmpty()) {
          // given vector is actaully in reverse
-         currentPoint = p.remove(index);
+         currentPoint = points.poll();
          System.out.println("Point to add = [" + currentPoint.row + "," +
                currentPoint.col + "]");
          dRow = previousPoint.row - currentPoint.row;
@@ -243,6 +244,8 @@ public class Agent {
          // check that the square is adjacent
          if(Math.abs(dRow + dCol) != 1){
             System.out.println("Something fishy going on here");
+            previousPoint = currentPoint;
+            currentPoint = points.poll();
          }else{
             if(dRow == -1){ // to the left
                nextDirection = WEST;
@@ -258,9 +261,8 @@ public class Agent {
                currentDirection = (currentDirection + 1) % 4;
             }
             list.add('F');
-            index = index - 1;
             previousPoint = currentPoint;
-            currentPoint = p.remove(index);
+            currentPoint = points.poll();
          }
       }
       return list;
