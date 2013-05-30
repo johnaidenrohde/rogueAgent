@@ -66,7 +66,7 @@ public class Agent {
       char action = PROMPT_USER;
 
       //intially explore the map for 200 turns
-      if(numTurns < 201){
+      if(numTurns < MAX_SEARCH){
          action = walk();
       }else{
          //Then work out what strategy we want to take
@@ -74,7 +74,7 @@ public class Agent {
       }
 
       //Otherwise prompt for input
-      if (action == PROMPT_USER || numTurns > MAX_SEARCH) {
+      if (action == PROMPT_USER) {
          // THE FOLLOWING FOR DEBUGGING ONLY:
          if (numTurns > MAX_SEARCH) {
             System.out.println("Max search moves exceeded!");
@@ -137,7 +137,7 @@ public class Agent {
       if (firstRun && map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
          return 'F';
       }
-      // this needs a rethink. Left-hand wallfollowing with Pledge.
+
       if (firstRun) {
          // forwards isn't walkable, turn right.
          firstRun = false;
@@ -226,7 +226,7 @@ public class Agent {
       Collections.reverse(points);
 
       LinkedList<Character> list = new LinkedList<Character>();
-      Point currentPoint, previousPoint;
+      Point nextPoint, previousPoint;
       int nextDirection = NORTH;
       int dRow, dCol;
       int currentDirection = dirn;
@@ -234,35 +234,58 @@ public class Agent {
       previousPoint = currPoint;
       System.out.println("currPoint = [" + currPoint.row + "," +
                currPoint.col + "]");
+      System.out.println("Current Direction: " + currentDirection);
       while (!points.isEmpty()) {
-         // given vector is actaully in reverse
-         currentPoint = points.poll();
-         System.out.println("Point to add = [" + currentPoint.row + "," +
-               currentPoint.col + "]");
-         dRow = currentPoint.row - previousPoint.row;
-         dCol = currentPoint.col - previousPoint.col;
+         // given vector is actually in reverse
+         nextPoint = points.poll();
+         System.out.println("Point to add = [" + nextPoint.row + "," +
+               nextPoint.col + "]");
+         System.out.println("Value of point to add: '" + map.getTileWithLocation(nextPoint).value + "'");
+         dRow = nextPoint.row - previousPoint.row;
+         dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
          if(Math.abs(dRow + dCol) != 1){
             System.out.println("Something fishy going on here");
-            System.out.println("Problem point to add = [" + currentPoint.row + "," +
-               currentPoint.col + "]");
-            previousPoint = currentPoint;
+            System.out.println("Problem point to add = [" + nextPoint.row + "," +
+               nextPoint.col + "]");
+            previousPoint = nextPoint;
          }else{
-            if(dRow == -1){ // to the left
-               nextDirection = WEST;
-            }else if( dRow == 1 ){ // to the right
-               nextDirection = EAST;
-            }else if( dCol == -1 ){ // below us
-               nextDirection = SOUTH;
-            }else if( dCol == 1 ){ //above us
+            // Seems to work better
+            if (nextPoint.row == previousPoint.row - 1) {
                nextDirection = NORTH;
+            } else if (nextPoint.row == previousPoint.row + 1) {
+               nextDirection = SOUTH;
+            } else if (nextPoint.row == previousPoint.row) {
+               if (nextPoint.col == previousPoint.col + 1) {
+                  nextDirection = EAST;
+               } else if (nextPoint.col == previousPoint.col - 1) {
+                  nextDirection = WEST;
+               }
             }
-            while( nextDirection != currentDirection){
+
+            // if(dRow == -1){ // to the left
+            //    nextDirection = WEST;
+            // }else if( dRow == 1 ){ // to the right
+            //    nextDirection = EAST;
+            // }else if( dCol == -1 ){ // below us
+            //    nextDirection = SOUTH;
+            // }else if( dCol == 1 ){ //above us
+            //    nextDirection = NORTH;
+            // }
+            while( nextDirection != currentDirection) {
+               
+               /*if (currentDirection < nextDirection) {
+                  list.add('L');
+                  currentDirection = (currentDirection + 1) % 4;
+               } else {
+                  list.add('R');
+                  currentDirection = (currentDirection - 1) % 4;
+               }*/
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             }
             list.add('F');
-            previousPoint = currentPoint;
+            previousPoint = nextPoint;
          }
       }
       return list;
@@ -328,6 +351,7 @@ public class Agent {
       case 'F': case 'f': // forward
          switch( ch ) {   // can't move into an obstacle or water
             case '*': case 'T': case '-': case '~':
+            System.out.println("Illegal forwards move made");
             return( false );
          }
          map.setTile(new Point(currPoint.row, currPoint.col, ' ')); // clear current location

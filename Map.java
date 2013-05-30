@@ -57,7 +57,7 @@ public class Map {
 		boolean interestingLine = false;
 		System.out.println("\n");
 		for( r=75; r < 125; r++ ) {
-			System.out.print( r + " ");
+			System.out.print( (r-0) + " ");
 			for( c=0; c < map[r].length; c++ ) {
 	            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
 	            	switch( currPoint.dirn ) {
@@ -228,7 +228,7 @@ public class Map {
 				}
 				if (hasBlank && startX != -1 && map[i][j] == ' ') {
 					// all criteria for this line to have orphaned blanks true
-					centreXs = startX+(j - startX);
+					centreXs = startX;//+(j - startX);
 					Point p = new Point(i, centreXs);
 					x.add(p);
 					// reset startX
