@@ -60,16 +60,15 @@ public class Astar
          if((curr.row == goal.row) && (curr.col == goal.col)){
             return tracePath(curr);
          }
-
          closedSet.add(curr);
-
          //For each neighbor node
-         for(int i = 4; i >= 0; i = i - 1){
+         for(int i = 0; i < 4; i = i + 1){
             neighbor = map.getTileInDirection(i, curr);
             // We only consider walkable nodes
             if(map.isWalkable(neighbor)){
                //The total length of the path to each neighbor node
                cost = curr.g + 1;
+
                //Remove this neighbor because the current path is better
                if((openSet.contains(neighbor))&&(cost < neighbor.g)){
                   openSet.remove(neighbor);
@@ -84,6 +83,8 @@ public class Astar
                   neighbor.setF(manDistance(neighbor, goal) + cost);
                   neighbor.setParent(curr);
                   openSet.add(neighbor);
+                  System.out.println ("Added Neighbor " + neighbor.row + ","
+                        + neighbor.col);
                }
             }
          }
