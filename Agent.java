@@ -21,6 +21,7 @@ public class Agent {
    final static int SOUTH  = 3;
 
    final static char PROMPT_USER = 'X';
+   final static char WALK_DONE = 'D';
 
    final static int MAX_SEARCH = 500;
 
@@ -38,6 +39,7 @@ public class Agent {
    private LinkedList<Character> mission;
    private boolean onMission = false;
    private int missionStep;
+   private boolean walkDone = false;
 
    private boolean firstRun    = true;
 
@@ -66,7 +68,7 @@ public class Agent {
       char action = PROMPT_USER;
 
       //intially explore the map for 200 turns
-      if(numTurns < MAX_SEARCH){
+      if(numTurns < 200){
          action = walk();
       }else{
          //Then work out what strategy we want to take
@@ -187,37 +189,73 @@ public class Agent {
       if(onMission){
          //if we are currently walking a path just return the next character
          if(!mission.isEmpty()){
-            return(mission.poll());
-         }else{
+            if (mission.peek() == 'F' && !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
+               // A* out of sync with world, for example an obstacle has 
+               // been revealed where there used to be an X. Try again.
+               System.out.println("A* out of sync");
+               onMission = false;
+            } else {
+               return(mission.poll());
+            }
+         } else {
             onMission = false;
          }
       }
 
-      //If we still have unknown regions on the map we explore them
-      Vector<Point> x = map.findGroupsX(currPoint);
-      while(!x.isEmpty()){
-         onMission = true;
-         for (int i = 0; i < x.size(); i++) {
-            Point y = x.get(i);
-            System.out.println("X group at: row="+y.row+", col="+y.col);
+      if (walkDone) {
+         if (have_gold) {
+            Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, map);
+            mission = getMoves(pathBack);
+            onMission = true;
+            return mission.poll();
+         } if (have_key) {
+            // all doors considered opened, change isWalkable
          }
-         //create the pathFinder
-         Astar pathFinder = new Astar();
-         //Chart a path to the group of X's
-         x = pathFinder.findPath(currPoint, x.get(0), map);
-         System.out.println("The path contains " + x.size() + " points");
-         if(x == null){
-            System.out.println("No path found!");
-         }else{
-            //get a plan from the returned set of points
-            mission = getMoves(x);
-            System.out.println("List of moves = " + mission.toString());
-            return(mission.poll());
+         // Find all essential pieces on board:
+         Point axe, gold, key;
+         Vector<Point> dynamite;
+         axe = map.getAxe();
+         gold = map.getGold();
+         key = map.getKey();
+         dynamite = map.getDynamite();
+
+         Vector<Point> path;
+         path = Astar.findPath(currPoint, gold, map);
+         if (path != null) {
+            // Pick up gold, return to start
+            mission = getMoves(path);
+            onMission = true;
+            return mission.poll();
+         } else {
+            return PROMPT_USER;
          }
-         x = map.findGroupsX(currPoint);
+      } else if (!walkDone) {
+         //If we still have unknown regions on the map we explore them
+         Vector<Point> x = map.findGroupsX(currPoint);
+         while(!x.isEmpty()){
+            onMission = true;
+            for (int i = 0; i < x.size(); i++) {
+               Point y = x.get(i);
+               System.out.println("X group at: row="+y.row+", col="+y.col);
+            }
+            //Chart a path to the group of X's
+            x = Astar.findPath(currPoint, x.get(0), map);
+            System.out.println("The path contains " + x.size() + " points");
+            if(x == null){
+               System.out.println("No path found!");
+            }else{
+               //get a plan from the returned set of points
+               mission = getMoves(x);
+               System.out.println("List of moves = " + mission.toString());
+               return(mission.poll());
+            }
+            x = map.findGroupsX(currPoint);
+         }
+         // If there is nothing left to do
+         walkDone = true;
       }
-      // If there is nothing left to do
-      return(PROMPT_USER);
+      // return something arbitrary if nothing to be done this turn
+      return 'R';
    }
 
    // translate a vector of points into a list of moves
@@ -263,28 +301,19 @@ public class Agent {
                }
             }
 
-            // if(dRow == -1){ // to the left
-            //    nextDirection = WEST;
-            // }else if( dRow == 1 ){ // to the right
-            //    nextDirection = EAST;
-            // }else if( dCol == -1 ){ // below us
-            //    nextDirection = SOUTH;
-            // }else if( dCol == 1 ){ //above us
-            //    nextDirection = NORTH;
-            // }
             while( nextDirection != currentDirection) {
-               
-               /*if (currentDirection < nextDirection) {
-                  list.add('L');
-                  currentDirection = (currentDirection + 1) % 4;
-               } else {
-                  list.add('R');
-                  currentDirection = (currentDirection - 1) % 4;
-               }*/
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             }
-            list.add('F');
+            if (map.getTileInDirection(currentDirection, currPoint).value == '-' && have_key) {
+               list.add('O');
+               list.add('F');
+            } else if (map.getTileInDirection(currentDirection, currPoint).value == 'T' && have_axe) {
+               list.add('C');
+               list.add('F');
+            } else {
+               list.add('F');
+            }
             previousPoint = nextPoint;
          }
       }
