@@ -117,7 +117,7 @@ public class Astar
     *
     * @return distance from currPos to goal
     */
-   private int manDistance(Point curr, Point goal){
+   public static int manDistance(Point curr, Point goal){
       int r, c;
       r = Math.abs(curr.row - goal.row);
       c = Math.abs(curr.col - goal.col);

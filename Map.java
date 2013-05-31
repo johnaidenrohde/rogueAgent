@@ -209,9 +209,15 @@ public class Map {
 		return -1;
 	}
 
-	public Vector<Point> findGroupsX () {
+	public Vector<Point> findGroupsX (Point currPoint) {
+
+
+		// adding PQ so agent finds groups sanely
+		Comparator<Point> comp = new PointComparator();
+		PriorityQueue<Point> pq = new PriorityQueue<Point>(500, comp);
+
 		// Vector of points, each point is center of first line of X group.
-		Vector<Point> x = new Vector<Point>();
+		Vector<Point> x;
 		// must only find groups of Xs with blanks on both sides.
 		int i;
 		for (i = 0; i < numRows; i++) {
@@ -230,13 +236,15 @@ public class Map {
 					// all criteria for this line to have orphaned blanks true
 					centreXs = startX;//+(j - startX);
 					Point p = new Point(i, centreXs);
-					x.add(p);
+					p.setF(Astar.manDistance(currPoint, p));
+					pq.add(p);
 					// reset startX
 					startX = -1;
 				}
 			} // finished scanning line
 
 		}
+		x = new Vector<Point>(pq);
 		return x;
 	}
 

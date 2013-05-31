@@ -194,7 +194,7 @@ public class Agent {
       }
 
       //If we still have unknown regions on the map we explore them
-      Vector<Point> x = map.findGroupsX();
+      Vector<Point> x = map.findGroupsX(currPoint);
       while(!x.isEmpty()){
          onMission = true;
          for (int i = 0; i < x.size(); i++) {
@@ -214,7 +214,7 @@ public class Agent {
             System.out.println("List of moves = " + mission.toString());
             return(mission.poll());
          }
-         x = map.findGroupsX();
+         x = map.findGroupsX(currPoint);
       }
       // If there is nothing left to do
       return(PROMPT_USER);
