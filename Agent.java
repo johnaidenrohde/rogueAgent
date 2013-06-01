@@ -209,13 +209,14 @@ public class Agent {
       // We need a new mission
       if (walkDone) { //Main game plan
          //Every time we start a new mission plan we get ourselves a planning
-         //map and modify it since we are gaurenteed a solution this doesn't
-         //need to be updated
+         //map and modify it. Since we are gaurenteed a solution this map
+         //doesn't need to be updated
          planMap = new Map(map);
 
          // Presumably if we have the gold we have a clear path to get back
+         // so we can use the regular map
          if (have_gold) {
-            Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, planMap);
+            Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, map);
             mission = getMoves(pathBack);
             onMission = true;
             return mission.poll();
@@ -238,13 +239,17 @@ public class Agent {
          // First try for gold then axes then keys
          char result = tryGet(gold, planMap);
          if( result != PROMPT_USER){
-            System.out.println("Couldn't find a path to the gold");
             return result;
-         } //else if( !have_axe && tryGet(axe, planMap) == PROMPT_USER ){
-            //System.out.println("Couldn't find a path to the axe");
-         //} else if( !have_key && tryGet(key, planMap) == PROMPT_USER ){
-           // System.out.println("Couldn't find a path to the key");
-         //}
+         }
+         result = tryGet(axe, planMap);
+         if( !have_axe && result != PROMPT_USER){
+            return result;
+         }
+         result = tryGet(key, planMap);
+         if( !have_key && result != PROMPT_USER){
+            return result;
+         }
+
       }
       // We still have unexplored regions we explore them
       else if (!walkDone) {
@@ -257,10 +262,10 @@ public class Agent {
             }
             //Chart a path to the group of X's
             x = Astar.findPath(currPoint, x.get(0), map);
-            System.out.println("The path contains " + x.size() + " points");
             if(x == null){
                System.out.println("No path found!");
             }else{
+               System.out.println("The path contains " + x.size() + " points");
                //get a plan from the returned set of points
                mission = getMoves(x);
                System.out.println("List of moves = " + mission.toString());
