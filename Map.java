@@ -56,9 +56,11 @@ public class Map {
 		int r,c;
 		boolean interestingLine = false;
 		System.out.println("\n");
+      // Fiddle with these for different maps
 		for( r=75; r < 125; r++ ) {
 			System.out.print( (r-0) + " ");
-			for( c=0; c < map[r].length; c++ ) {
+      // Fiddle with these for different maps
+			for( c=50; c < 140; c++ ) {
 	            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
 	            	switch( currPoint.dirn ) {
 	            		case NORTH: ch = '^'; break;

@@ -14,6 +14,7 @@ import java.io.*;
 
 public class Astar
 {
+    public static final int MAX_ITERATIONS = 10000;
 
    /* Finds the shortest distance between two points on a given map. Does not
     * allow for diagonal movement.
@@ -21,7 +22,7 @@ public class Astar
     * @param Two points, curr and goal, and the map
     * @return the path as a vector of points starting at the current position
     */
-   public Vector<Point> findPath( Point start, Point goal, Map map ){
+   public static Vector<Point> findPath( Point start, Point goal, Map map ){
 
       Point curr;
       Point neighbor;
@@ -50,9 +51,12 @@ public class Astar
       curr.setF(manDistance(curr, goal));
       curr.setG(0);
       openSet.add(curr);
+      int iterations = 1;
 
 
-      while( openSet.peek() != null ){
+      while( openSet.peek() != null && iterations < MAX_ITERATIONS ){
+        // System.out.println("Iteration: " + iterations);
+        iterations++;
 
          curr = openSet.poll();
          //System.out.println ("Considering point " + curr.row + ","
@@ -102,7 +106,7 @@ public class Astar
     * @param a point with a parent to follow
     * @return a set of points traveled
     */
-   private Vector<Point> tracePath( Point toFollow  ){
+   private static Vector<Point> tracePath( Point toFollow  ){
       Vector<Point> toReturn = new Vector<Point>(640);
       while(toFollow.parent != null){
         System.out.println("Tracepath: "+ toFollow.row + ","

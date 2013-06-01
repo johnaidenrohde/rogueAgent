@@ -16,27 +16,27 @@ Map	Map.java	/^	public Map (int rows, int cols, char initialValue) {$/;"	m	class
 Map	Map.java	/^public class Map {$/;"	c
 NORTH	Agent.java	/^   final static int NORTH  = 1;$/;"	f	class:Agent
 NORTH	Map.java	/^   	final static int NORTH  = 1;$/;"	f	class:Map
-NORTH	Point.java	/^   final static int NORTH  = 1;$/;"	f	class:Point
+NORTH	Point.java	/^	final static int NORTH  = 1;$/;"	f	class:Point
 NORTH	Rogue.java	/^   final static int NORTH  = 1;$/;"	f	class:Rogue
 NORTH_EAST	Map.java	/^   	final static int NORTH_EAST = 4;$/;"	f	class:Map
 NORTH_WEST	Map.java	/^   	final static int NORTH_WEST = 7;$/;"	f	class:Map
 PROMPT_USER	Agent.java	/^   final static char PROMPT_USER = 'X';$/;"	f	class:Agent
 Point	Point.java	/^	public Point (int row, int col) {$/;"	m	class:Point
+Point	Point.java	/^	public Point (int row, int col, Point parent) {$/;"	m	class:Point
 Point	Point.java	/^	public Point (int row, int col, char value) {$/;"	m	class:Point
-Point	Point.java	/^   public Point (int row, int col, Point parent) {$/;"	m	class:Point
 Point	Point.java	/^public class Point {$/;"	c
 PointComparator	PointComparator.java	/^public class PointComparator implements Comparator<Point>$/;"	c
 Rogue	Rogue.java	/^public class Rogue {$/;"	c
 SOUTH	Agent.java	/^   final static int SOUTH  = 3;$/;"	f	class:Agent
 SOUTH	Map.java	/^   	final static int SOUTH  = 3;$/;"	f	class:Map
-SOUTH	Point.java	/^   final static int SOUTH  = 3;$/;"	f	class:Point
+SOUTH	Point.java	/^	final static int SOUTH  = 3;$/;"	f	class:Point
 SOUTH	Rogue.java	/^   final static int SOUTH  = 3;$/;"	f	class:Rogue
 SOUTH_EAST	Map.java	/^   	final static int SOUTH_EAST = 5;$/;"	f	class:Map
 SOUTH_WEST	Map.java	/^   	final static int SOUTH_WEST = 6;$/;"	f	class:Map
 UNVISITED	Map.java	/^	public static final char UNVISITED = 'X';$/;"	f	class:Map
 WEST	Agent.java	/^   final static int WEST   = 2;$/;"	f	class:Agent
 WEST	Map.java	/^   	final static int WEST   = 2;$/;"	f	class:Map
-WEST	Point.java	/^   final static int WEST   = 2;$/;"	f	class:Point
+WEST	Point.java	/^	final static int WEST   = 2;$/;"	f	class:Point
 WEST	Rogue.java	/^   final static int WEST   = 2;$/;"	f	class:Rogue
 apply	Rogue.java	/^   private boolean apply( char action )$/;"	m	class:Rogue	file:
 axe	Map.java	/^	private Point   axe = null;$/;"	f	class:Map	file:
@@ -49,7 +49,7 @@ dirn	Point.java	/^	public int dirn;$/;"	f	class:Point
 dirn	Rogue.java	/^   private int row,col,dirn;$/;"	f	class:Rogue	file:
 dynamite	Map.java	/^	private Vector<Point> dynamite = new Vector<Point>();$/;"	f	class:Map	file:
 f	Point.java	/^   public int f;$/;"	f	class:Point
-findGroupsX	Map.java	/^	public Vector<Point> findGroupsX () {$/;"	m	class:Map
+findGroupsX	Map.java	/^	public Vector<Point> findGroupsX (Point currPoint) {$/;"	m	class:Map
 findPath	Astar.java	/^   public Vector<Point> findPath( Point start, Point goal, Map map ){$/;"	m	class:Astar
 firstRun	Agent.java	/^   private boolean firstRun    = true;$/;"	f	class:Agent	file:
 g	Point.java	/^   public int g;$/;"	f	class:Point
@@ -64,7 +64,7 @@ getDirectionFromTurn	Agent.java	/^   private int getDirectionFromTurn(char turnD
 getDynamite	Map.java	/^	public Vector<Point> getDynamite() {$/;"	m	class:Map
 getGold	Map.java	/^	public Point getGold() {$/;"	m	class:Map
 getKey	Map.java	/^	public Point getKey() {$/;"	m	class:Map
-getMoves	Agent.java	/^   private Vector<Character> getMoves(Vector<Point> p) {$/;"	m	class:Agent	file:
+getMoves	Agent.java	/^   private LinkedList<Character> getMoves(Vector <Point> p) {$/;"	m	class:Agent	file:
 getTileInDirection	Map.java	/^	public Point getTileInDirection(int direction, Point currPoint) {$/;"	m	class:Map
 getTileWithLocation	Map.java	/^	public Point getTileWithLocation(Point location) {$/;"	m	class:Map
 getTileWithLocation	Map.java	/^	public Point getTileWithLocation(int row, int col) {$/;"	m	class:Map
@@ -85,16 +85,19 @@ isWalkable	Map.java	/^   public boolean isWalkable(Point p) {$/;"	m	class:Map
 key	Map.java	/^	private Point   key = null;$/;"	f	class:Map	file:
 main	Agent.java	/^   public static void main( String[] args ){$/;"	m	class:Agent
 main	Rogue.java	/^   public static void main( String[] args )$/;"	m	class:Rogue
-manDistance	Astar.java	/^   private int manDistance(Point curr, Point goal){$/;"	m	class:Astar	file:
+manDistance	Astar.java	/^   public static int manDistance(Point curr, Point goal){$/;"	m	class:Astar
 map	Agent.java	/^   private Map     map;$/;"	f	class:Agent	file:
 map	Map.java	/^	private char[][] map;$/;"	f	class:Map	file:
 map	Rogue.java	/^   private char[][] map;$/;"	f	class:Rogue	file:
+mission	Agent.java	/^   private LinkedList<Character> mission;$/;"	f	class:Agent	file:
+missionStep	Agent.java	/^   private int missionStep;$/;"	f	class:Agent	file:
 nrows	Rogue.java	/^   private int nrows;     \/\/ number of rows in environment$/;"	f	class:Rogue	file:
 numCols	Map.java	/^	public int numRows, numCols;$/;"	f	class:Map
 numRows	Map.java	/^	public int numRows, numCols;$/;"	f	class:Map
 numTurns	Agent.java	/^   private int     numTurns  = 0;$/;"	f	class:Agent	file:
 num_dynamites_held	Agent.java	/^   private int     num_dynamites_held  = 0;$/;"	f	class:Agent	file:
 num_dynamites_held	Rogue.java	/^   private int num_dynamites_held = 0;$/;"	f	class:Rogue	file:
+onMission	Agent.java	/^   private boolean onMission = false;$/;"	f	class:Agent	file:
 parent	Point.java	/^   public Point parent;$/;"	f	class:Point
 printMap	Map.java	/^	public void printMap (Point currPoint) {$/;"	m	class:Map
 printUsage	Rogue.java	/^   private static void printUsage()$/;"	m	class:Rogue	file:
@@ -104,8 +107,8 @@ read_map	Rogue.java	/^   private void read_map( String mapName ) {$/;"	m	class:R
 row	Point.java	/^	public int row;$/;"	f	class:Point
 row	Rogue.java	/^   private int row,col,dirn;$/;"	f	class:Rogue	file:
 setF	Point.java	/^   public void setF (int f){$/;"	m	class:Point
-setG	Point.java	/^   public void setG (int g){$/;"	m	class:Point
-setParent	Point.java	/^   public void setParent (Point parent){$/;"	m	class:Point
+setG	Point.java	/^	public void setG (int g){$/;"	m	class:Point
+setParent	Point.java	/^	public void setParent (Point parent){$/;"	m	class:Point
 setTile	Map.java	/^	public void setTile(Point location) {$/;"	m	class:Map
 stage	Agent.java	/^   private int stage = 0;$/;"	f	class:Agent	file:
 startPoint	Agent.java	/^   private Point   startPoint;$/;"	f	class:Agent	file:
