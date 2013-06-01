@@ -263,8 +263,8 @@ public class Agent {
             //Chart a path to the group of X's
             result = tryGet(x.get(i), map);
             if(result != PROMPT_USER){ // If you can reach the group
-               System.out.println("Path found!");
-               return(mission.poll());
+               System.out.println("Made it with instruction" + mission.peek());
+               return(result);
             }
             System.out.println("No path to that one");
          }
@@ -274,7 +274,7 @@ public class Agent {
       }
 
       // Place holder move
-      return('?');
+      return('R');
    }
 
    /* Try to get the given goal node
@@ -289,6 +289,7 @@ public class Agent {
       if (path != null) {
          // Find a path to what you want
          mission = getMoves(path);
+         System.out.println("Path found = " + mission.toString());
          onMission = true;
          // Return the first step on our triumphant journey
          return mission.poll();
