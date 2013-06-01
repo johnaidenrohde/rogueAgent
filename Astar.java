@@ -54,13 +54,17 @@ public class Astar
       int iterations = 1;
 
 
-      while( openSet.peek() != null && iterations < MAX_ITERATIONS ){
-        // System.out.println("Iteration: " + iterations);
-        iterations++;
+      while( openSet.size() != 0 ){
+         // System.out.println("Iteration: " + iterations);
+         // iterations++;
 
          curr = openSet.poll();
          //System.out.println ("Considering point " + curr.row + ","
-           //             + curr.col);
+           //           + curr.col);
+
+         //View the progression of the search
+         //map.rewrite(curr, '@');
+         //map.printMap( start );
 
          //If we have arrived at the goal
          if((curr.row == goal.row) && (curr.col == goal.col)){
@@ -74,23 +78,21 @@ public class Astar
             if(map.isWalkable(neighbor)){
                //The total length of the path to each neighbor node
                cost = curr.g + 1;
-
                //Remove this neighbor because the current path is better
                if((openSet.contains(neighbor))&&(cost < neighbor.g)){
                   openSet.remove(neighbor);
                }
-               //Shouldn't happen too often
-               /*if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
+               if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
                   closedSet.remove(neighbor);
-               }*/
+               }
                //If we haven't considered this square it yet
                if(!(closedSet.contains(neighbor))&& !(openSet.contains(neighbor))){
                   neighbor.setG(cost);
                   neighbor.setF(manDistance(neighbor, goal) + cost);
                   neighbor.setParent(curr);
                   openSet.add(neighbor);
-                  //System.out.println ("Added Neighbor " + neighbor.row + ","
-                 //       + neighbor.col);
+                  //System.out.println ("Added Neighbor " + i  + neighbor.row + ","
+                    //    + neighbor.col);
                }
             }
          }

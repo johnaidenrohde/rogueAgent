@@ -270,6 +270,13 @@ public class Map {
 		return x;
 	}
 
+   //Nasty hacky function used only for debugging
+   public void rewrite(Point p, char toWrite){
+      map[p.row][p.col] = toWrite;
+   }
+
+
+
    /* Used to remove all of a give item from the map.
     *
     * Called by the action planner.
