@@ -236,6 +236,7 @@ public class Agent {
          dynamite = map.getDynamite();
 
          //Can we get the gold from where we are standing
+         // SHOULD BE IN ITS OWN FUNCTION
          Vector<Point> path;
          path = Astar.findPath(currPoint, gold, planMap);
          if (path != null) {
@@ -245,6 +246,7 @@ public class Agent {
             // Return the first step on our triumphant journey
             return mission.poll();
          } else {
+            System.out.println("Couldn't find a path to the gold");
             return PROMPT_USER;
          }
       }

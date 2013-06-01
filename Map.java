@@ -256,7 +256,8 @@ public class Map {
     *
     * Called by the action planner.
     */
-   public removeAllItems(char toRemove){
+   public void removeAllItems(char toRemove){
+      int i, j;
       for(i =0; i < numRows; i++){
          for(j =0; j < numCols; j++){
             if(map[i][j] == toRemove){
