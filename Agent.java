@@ -190,7 +190,7 @@ public class Agent {
          //if we are currently walking a path just return the next character
          if(!mission.isEmpty()){
             if (mission.peek() == 'F' && !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
-               // A* out of sync with world, for example an obstacle has 
+               _// A* out of sync with world, for example an obstacle has
                // been revealed where there used to be an X. Try again.
                System.out.println("A* out of sync");
                onMission = false;
@@ -208,9 +208,12 @@ public class Agent {
             mission = getMoves(pathBack);
             onMission = true;
             return mission.poll();
-         } if (have_key) {
+         }if (have_key) {
             // all doors considered opened, change isWalkable
+         }if (have_axe){
+            // all trees can be removed from the map.
          }
+
          // Find all essential pieces on board:
          Point axe, gold, key;
          Vector<Point> dynamite;
@@ -254,17 +257,10 @@ public class Agent {
          // If there is nothing left to do
          walkDone = true;
       }
-<<<<<<< HEAD
 
-      //Now we start actually playing
-      //while(!gameWon)
-
-      // If there is nothing left to do
-      return(PROMPT_USER);
-=======
       // return something arbitrary if nothing to be done this turn
-      return 'R';
->>>>>>> f1c551ee0cdbeab0098f26d377a0327adb1c2807
+      //return 'R';
+      return PROMPT_USER;
    }
 
    // translate a vector of points into a list of moves
@@ -311,7 +307,6 @@ public class Agent {
             }
 
             while( nextDirection != currentDirection) {
-<<<<<<< HEAD
 
                /*if (currentDirection < nextDirection) {
                   list.add('L');
@@ -320,15 +315,15 @@ public class Agent {
                   list.add('R');
                   currentDirection = (currentDirection - 1) % 4;
                }*/
-=======
->>>>>>> f1c551ee0cdbeab0098f26d377a0327adb1c2807
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             }
-            if (map.getTileInDirection(currentDirection, currPoint).value == '-' && have_key) {
+            if (map.getTileInDirection(currentDirection, currPoint).value
+                  == '-' && have_key) {
                list.add('O');
                list.add('F');
-            } else if (map.getTileInDirection(currentDirection, currPoint).value == 'T' && have_axe) {
+            } else if (map.getTileInDirection(currentDirection, currPoint).value
+                  == 'T' && have_axe) {
                list.add('C');
                list.add('F');
             } else {
