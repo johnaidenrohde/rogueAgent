@@ -276,11 +276,13 @@ public class Agent {
          walkDone = true;
       }
 
-      // We run out of stuff to do
-      return PROMPT_USER;
+      // Place holder move
+      return('R');
    }
 
-   // translate a vector of points into a list of moves
+   /* translate a vector of points into a list of moves
+    *
+    * */
    private LinkedList<Character> getMoves(Vector <Point> p) {
       LinkedList<Point> points = new LinkedList<Point>(p);
       Collections.reverse(points);
