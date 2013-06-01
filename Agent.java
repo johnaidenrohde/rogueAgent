@@ -38,7 +38,6 @@ public class Agent {
    private int     dirn;
 
    // variable for planning
-   private int stage = 0;
    private LinkedList<Character> mission;
    private boolean onMission = false;
    private int missionStep;
@@ -171,7 +170,6 @@ public class Agent {
          willAdvance = false;
          return 'F';
       }
-      stage = 1;
       return PROMPT_USER;
    }
 
@@ -188,10 +186,16 @@ public class Agent {
  ******************************************************************************/
 
 
+
+   /* The central function which handles the basic intelligence of the game.
+    * Essentially it starts the game by filling in all of the map that it can
+    * and then tries to construct a plan that will allow it to win the game.
+    *
+    */
    private char gamePlan(){
-      // We are currently on a mission
+      char result;
+      //if we are currently walking a path just return the next character
       if(onMission){
-         //if we are currently walking a path just return the next character
          if(!mission.isEmpty()){
             if (mission.peek() == 'F' &&
                   !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
@@ -209,7 +213,7 @@ public class Agent {
       // We need a new mission
       if (walkDone) { //Main game plan
          //Every time we start a new mission plan we get ourselves a planning
-         //map and modify it. Since we are gaurenteed a solution this map
+         //map and modify it. Since we are garuanteed a solution this map
          //doesn't need to be updated
          planMap = new Map(map);
 
@@ -237,7 +241,7 @@ public class Agent {
          dynamite = map.getDynamite();
 
          // First try for gold then axes then keys
-         char result = tryGet(gold, planMap);
+         result = tryGet(gold, planMap);
          if( result != PROMPT_USER){
             return result;
          }
@@ -250,40 +254,32 @@ public class Agent {
             return result;
          }
 
-      }
-      // We still have unexplored regions we explore them
-      else if (!walkDone) {
+      }else{ // We still have unexplored regions, so we explore them
+         Vector<Point> path;
          Vector<Point> x = map.findGroupsX(currPoint);
-         while(!x.isEmpty()){
-            onMission = true;
-            for (int i = 0; i < x.size(); i++) {
-               Point y = x.get(i);
-               System.out.println("X group at: row="+y.row+", col="+y.col);
-            }
+         int size = x.size();
+         for (int i = 0; i < x.size(); i++) {
+            System.out.println("X group has " + x.size());
             //Chart a path to the group of X's
-            x = Astar.findPath(currPoint, x.get(0), map);
-            if(x == null){
-               System.out.println("No path found!");
-            }else{
-               System.out.println("The path contains " + x.size() + " points");
-               //get a plan from the returned set of points
-               mission = getMoves(x);
-               System.out.println("List of moves = " + mission.toString());
+            result = tryGet(x.get(i), map);
+            if(result != PROMPT_USER){ // If you can reach the group
+               System.out.println("Path found!");
                return(mission.poll());
             }
-            x = map.findGroupsX(currPoint);
+            System.out.println("No path to that one");
          }
-         // If there is nothing left to do
-         walkDone = true;
+         // If there is no group of Xs we can reach
+         System.out.println("Done Exploring");
+            walkDone = true;
       }
 
       // Place holder move
-      return('R');
+      return('?');
    }
 
-   /* Try to get the gold
+   /* Try to get the given goal node
     *
-    * @param NONE
+    * @param goal: Where you want to go, map: What you can see
     * @return Set the mission and return the first charater or PROMPT_USER
     * */
    private char tryGet( Point goal, Map planMap ){
@@ -368,7 +364,7 @@ public class Agent {
                   == 'T' && have_axe) {
                list.add('C');
                list.add('F');
-            } //Otheerwise we continue on our merry way
+            } //Otherwise we continue on our merry way
             else {
                list.add('F');
             }
