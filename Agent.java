@@ -227,7 +227,7 @@ public class Agent {
             planMap.removeAllItems('T');
          }
 
-         // Find all essential pieces on board:
+         // Find the location of all essential pieces on board:
          Point axe, gold, key;
          Vector<Point> dynamite;
          axe = map.getAxe();
@@ -235,19 +235,13 @@ public class Agent {
          key = map.getKey();
          dynamite = map.getDynamite();
 
-         //Can we get the gold from where we are standing
-         // SHOULD BE IN ITS OWN FUNCTION
-         Vector<Point> path;
-         path = Astar.findPath(currPoint, gold, planMap);
-         if (path != null) {
-            // Pick up gold, return to start
-            mission = getMoves(path);
-            onMission = true;
-            // Return the first step on our triumphant journey
-            return mission.poll();
-         } else {
+         // First try for gold then axes then keys
+         if( tryGet(gold) == PROMPT_USER){
             System.out.println("Couldn't find a path to the gold");
-            return PROMPT_USER;
+         } else if( !have_axe && tryGet(axe) == PROMPT_USER ){
+            System.out.println("Couldn't find a path to the axe");
+         } else if( !have_key && tryGet(key) == PROMPT_USER ){
+            System.out.println("Couldn't find a path to the key");
          }
       }
       // We still have unexplored regions we explore them
@@ -280,6 +274,26 @@ public class Agent {
       return('R');
    }
 
+   /* Try to get the gold
+    *
+    * @param NONE
+    * @return Set the mission and return the first charater or PROMPT_USER
+    * */
+   private char tryGet( Point goal ){
+      //Can we get the gold from where we are standing
+      Vector<Point> path;
+      path = Astar.findPath(currPoint, goal, planMap);
+      if (path != null) {
+         // Find a path to what you want
+         mission = getMoves(path);
+         onMission = true;
+         // Return the first step on our triumphant journey
+         return mission.poll();
+      } else {
+         return PROMPT_USER;
+      }
+
+   }
    /* translate a vector of points into a list of moves
     *
     * */
@@ -302,14 +316,15 @@ public class Agent {
          nextPoint = points.poll();
          System.out.println("Point to add = [" + nextPoint.row + "," +
                nextPoint.col + "]");
-         System.out.println("Value of point to add: '" + map.getTileWithLocation(nextPoint).value + "'");
+         System.out.println("Value of point to add: '" +
+               map.getTileWithLocation(nextPoint).value + "'");
          dRow = nextPoint.row - previousPoint.row;
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
          if(Math.abs(dRow + dCol) != 1){
             System.out.println("Something fishy going on here");
-            System.out.println("Problem point to add = [" + nextPoint.row + "," +
-               nextPoint.col + "]");
+            System.out.println("Problem point to add = [" + nextPoint.row + ","
+                  + nextPoint.col + "]");
             previousPoint = nextPoint;
          }else{
             // Seems to work better
@@ -465,9 +480,9 @@ public class Agent {
       //The way the agent is facing is considered north
       dirn = NORTH;
 
-      //Initialize the map
+      //Initialize boths maps
       map = new Map(200,200,Map.UNVISITED);
-
+      planMap = new Map(200,200,Map.UNVISITED);
       map.updateMap(view, currPoint);
    }
 
