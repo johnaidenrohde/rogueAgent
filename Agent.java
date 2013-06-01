@@ -27,6 +27,9 @@ public class Agent {
 
    private Map     map;
 
+   //Used in path planning
+   private Map     planMap;
+
    // initial row and column
    private Point   startPoint;
 
@@ -186,11 +189,13 @@ public class Agent {
 
 
    private char gamePlan(){
+      // We are currently on a mission
       if(onMission){
          //if we are currently walking a path just return the next character
          if(!mission.isEmpty()){
-            if (mission.peek() == 'F' && !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
-               _// A* out of sync with world, for example an obstacle has
+            if (mission.peek() == 'F' &&
+                  !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
+               // A* out of sync with world, for example an obstacle has
                // been revealed where there used to be an X. Try again.
                System.out.println("A* out of sync");
                onMission = false;
@@ -201,17 +206,25 @@ public class Agent {
             onMission = false;
          }
       }
+      // We need a new mission
+      if (walkDone) { //Main game plan
+         //Every time we start a new mission plan we get ourselves a planning
+         //map and modify it since we are gaurenteed a solution this doesn't
+         //need to be updated
+         planMap = map;
 
-      if (walkDone) {
+         // Presumably if we have the gold we have a clear path to get back
          if (have_gold) {
-            Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, map);
+            Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, planMap);
             mission = getMoves(pathBack);
             onMission = true;
             return mission.poll();
          }if (have_key) {
             // all doors considered opened, change isWalkable
+            planMap.removeAllItems('-');
          }if (have_axe){
             // all trees can be removed from the map.
+            planMap.removeAllItems('T');
          }
 
          // Find all essential pieces on board:
@@ -222,18 +235,21 @@ public class Agent {
          key = map.getKey();
          dynamite = map.getDynamite();
 
+         //Can we get the gold from where we are standing
          Vector<Point> path;
-         path = Astar.findPath(currPoint, gold, map);
+         path = Astar.findPath(currPoint, gold, planMap);
          if (path != null) {
             // Pick up gold, return to start
             mission = getMoves(path);
             onMission = true;
+            // Return the first step on our triumphant journey
             return mission.poll();
          } else {
             return PROMPT_USER;
          }
-      } else if (!walkDone) {
-         //If we still have unknown regions on the map we explore them
+      }
+      // We still have unexplored regions we explore them
+      else if (!walkDone) {
          Vector<Point> x = map.findGroupsX(currPoint);
          while(!x.isEmpty()){
             onMission = true;
@@ -258,8 +274,7 @@ public class Agent {
          walkDone = true;
       }
 
-      // return something arbitrary if nothing to be done this turn
-      //return 'R';
+      // We run out of stuff to do
       return PROMPT_USER;
    }
 
@@ -317,16 +332,18 @@ public class Agent {
                }*/
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
-            }
+            } //If we come up to a door we open it
             if (map.getTileInDirection(currentDirection, currPoint).value
                   == '-' && have_key) {
                list.add('O');
                list.add('F');
-            } else if (map.getTileInDirection(currentDirection, currPoint).value
+            } //And chop down any trees
+            else if (map.getTileInDirection(currentDirection, currPoint).value
                   == 'T' && have_axe) {
                list.add('C');
                list.add('F');
-            } else {
+            } //Otheerwise we continue on our merry way
+            else {
                list.add('F');
             }
             previousPoint = nextPoint;

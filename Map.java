@@ -160,6 +160,8 @@ public class Map {
       }
    }
 
+
+
 	public boolean isAdjacentTo(Point p, Point curr) {
 		int dRow, dCol;
 		dRow = p.row - curr.row;
@@ -249,6 +251,20 @@ public class Map {
 		x = new Vector<Point>(pq);
 		return x;
 	}
+
+   /* Used to remove all of a give item from the map.
+    *
+    * Called by the action planner.
+    */
+   public removeAllItems(char toRemove){
+      for(i =0; i < numRows; i++){
+         for(j =0; j < numCols; j++){
+            if(map[i][j] == toRemove){
+               map[i][j] = ' ';
+            }
+         }
+      }
+   }
 
 	public void setTile(Point location) {
 		map[location.row][location.col] = location.value;
