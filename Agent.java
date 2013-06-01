@@ -211,7 +211,7 @@ public class Agent {
          //Every time we start a new mission plan we get ourselves a planning
          //map and modify it since we are gaurenteed a solution this doesn't
          //need to be updated
-         planMap = map;
+         planMap = new Map(map);
 
          // Presumably if we have the gold we have a clear path to get back
          if (have_gold) {
@@ -236,13 +236,15 @@ public class Agent {
          dynamite = map.getDynamite();
 
          // First try for gold then axes then keys
-         if( tryGet(gold) == PROMPT_USER){
+         char result = tryGet(gold, planMap);
+         if( result != PROMPT_USER){
             System.out.println("Couldn't find a path to the gold");
-         } else if( !have_axe && tryGet(axe) == PROMPT_USER ){
-            System.out.println("Couldn't find a path to the axe");
-         } else if( !have_key && tryGet(key) == PROMPT_USER ){
-            System.out.println("Couldn't find a path to the key");
-         }
+            return result;
+         } //else if( !have_axe && tryGet(axe, planMap) == PROMPT_USER ){
+            //System.out.println("Couldn't find a path to the axe");
+         //} else if( !have_key && tryGet(key, planMap) == PROMPT_USER ){
+           // System.out.println("Couldn't find a path to the key");
+         //}
       }
       // We still have unexplored regions we explore them
       else if (!walkDone) {
@@ -279,7 +281,7 @@ public class Agent {
     * @param NONE
     * @return Set the mission and return the first charater or PROMPT_USER
     * */
-   private char tryGet( Point goal ){
+   private char tryGet( Point goal, Map planMap ){
       //Can we get the gold from where we are standing
       Vector<Point> path;
       path = Astar.findPath(currPoint, goal, planMap);
@@ -482,7 +484,6 @@ public class Agent {
 
       //Initialize boths maps
       map = new Map(200,200,Map.UNVISITED);
-      planMap = new Map(200,200,Map.UNVISITED);
       map.updateMap(view, currPoint);
    }
 

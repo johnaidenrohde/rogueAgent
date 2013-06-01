@@ -49,6 +49,24 @@ public class Map {
 			}
 		}
 	}
+/*
+ * Copy constructor
+ *
+ */
+   public Map(Map another) {
+      this.map = another.map;
+	   this.numRows = another.numRows;
+      this.numCols = another.numRows;
+      this.axe = another.axe;
+	   this.key = another.key;
+	   this.gold =  another.gold;
+	   this.dynamite = another.dynamite;
+   }
+
+
+/*******************************************************************************
+ * USEFUL FUNCTIONS *
+ ******************************************************************************/
 
 	// print out larger map while debugging
 	public void printMap (Point currPoint) {
