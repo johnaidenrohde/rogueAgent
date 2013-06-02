@@ -29,7 +29,7 @@ public class Map {
     private boolean unknownOff = false;
 
     private PriorityQueue<Point> pointsToDynamite;
-    public LinkedList<Point> hasBeenDynamited;
+    public LinkedList<Point> hasBeenDynamited = new LinkedList<Point>();
 
     public Map (int rows, int cols, char initialValue) {
         numRows = rows;
@@ -178,7 +178,7 @@ public class Map {
             return true;
         }else if( tile == 'X' && unknownOff ){
             return false;
-        } else if (pointsToDynamite != null && pointsToDynamite.contains(p)) {
+        } else if (!hasBeenDynamited.isEmpty() && hasBeenDynamited.contains(p)) {
             return true;
         } else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
             return false;
@@ -257,7 +257,7 @@ public class Map {
             Comparator<Point> comp = new PointComparator();
             pointsToDynamite = new PriorityQueue<Point>(100, comp);
         }
-        hasBeenDynamited = new LinkedList<Point>();
+        hasBeenDynamited.clear();
 
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {

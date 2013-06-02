@@ -430,8 +430,9 @@ public class Agent {
             Point toEnter =  map.getTileInDirection(currentDirection, currPoint);
             //If the point was on our list to dynamite we blow it up
             if( toDynamite.contains(toEnter)){
-               list.add('D');
+               list.add('B');
                list.add('F');
+               toDynamite.remove(toEnter);
             } //If we come up to a door we open it
             else if (map.getTileInDirection(currentDirection, currPoint).value
                   == '-' && have_key) {
