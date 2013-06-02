@@ -30,7 +30,7 @@ public class Map {
     private boolean unknownOff = false;
 
     public boolean pointsInit = false;
-    private PriorityQueue<Point> points;
+    private PriorityQueue<Point> pointsToDynamite;
 
     public Map (int rows, int cols, char initialValue) {
         numRows = rows;
@@ -179,7 +179,9 @@ public class Map {
             return true;
         }else if( tile == 'X' && unknownOff ){
             return false;
-        }else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
+        } else if (pointsToDynamite.contains(p)) {
+            return true;
+        } else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
             return false;
         }
       //Otherwise
@@ -250,11 +252,11 @@ public class Map {
     public void refreshDynamite() {
         if (gold == null) {
             // points go into queue in arbitrary order
-            points = new PriorityQueue<Point>();
+            pointsToDynamite = new PriorityQueue<Point>();
         } else {
             // points ordered by man distance
             Comparator<Point> comp = new PointComparator();
-            points = new PriorityQueue<Point>(100, comp);
+            pointsToDynamite = new PriorityQueue<Point>(100, comp);
         }
 
         for (int i = 0; i < numRows; i++) {
@@ -263,8 +265,8 @@ public class Map {
                     // it's dynamitable! add to queue.
                     Point p = new Point(i,j,map[i][j]);
                     findGoldDistance(p);
-                    if (!points.contains(p)){ 
-                        points.add(p);
+                    if (!pointsToDynamite.contains(p)){ 
+                        pointsToDynamite.add(p);
                     }
                 }
             }
@@ -274,7 +276,7 @@ public class Map {
 
     public Point dynamite() {
         // find dynamitable things radiating out from gold (if exists).
-        Point next = points.poll();
+        Point next = pointsToDynamite.poll();
         return next;
     }
 
