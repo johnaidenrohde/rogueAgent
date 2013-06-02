@@ -14,6 +14,8 @@ public class Map {
    	final static int SOUTH_EAST = 5;
    	final static int SOUTH_WEST = 6;
    	final static int NORTH_WEST = 7;
+   	final static int AXE = 0;
+   	final static int KEY = 1;
 
 
 	private char[][] map;
@@ -76,7 +78,7 @@ public class Map {
 		System.out.println("\n");
       // Fiddle with these for different maps
 		for( r=75; r < 125; r++ ) {
-			System.out.print( (r-0) + " ");
+			System.out.print( (r-0) + "\t");
       // Fiddle with these for different maps
 			for( c=50; c < 140; c++ ) {
 	            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
@@ -167,17 +169,31 @@ public class Map {
 		Point tile = new Point(new_row, new_col, ch);
 		return tile;
 	}
+	
+	public boolean isWalkable(Point p) {
+		switch(tile) {
+			case '*': case 'T': case '-': case '~':
+			return false;
+			default:
+			return true;
+		}
 
-   public boolean isWalkable(Point p) {
+   public boolean isWalkable(Point p, boolean[] inventory) {
       char tile = p.value;
-      switch(tile) {
-         case '*': case 'T': case '-': case '~':
-         return false;
-         default:
-         return true;
+      if (inventory[AXE] && tile == 'T') {
+      	return true;
+      } else if (!inventory[AXE] && tile == 'T') {
+      	return false;
+      } else if (inventory[KEY] && tile == '-') {
+      	return true;
+      } else if (!inventory[KEY] && tile == '-') {
+      	return false;
+      } else if (tile == '*' || tile == '~') {
+      	return false;
+      } else {
+      	return true;
       }
    }
-
 
 
 	public boolean isAdjacentTo(Point p, Point curr) {

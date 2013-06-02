@@ -48,4 +48,13 @@ public class Point {
 		this.g = g;
 	}
 
+	@Override
+	public boolean equals (Object o) {
+		if (o instanceof Point) {
+			Point p = (Point) o;
+			return row == p.row && col == p.col;
+		}
+		return false;
+	}
+
 }

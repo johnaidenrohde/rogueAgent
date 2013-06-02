@@ -22,6 +22,8 @@ public class Agent {
 
    final static char PROMPT_USER = 'X';
    final static char WALK_DONE = 'D';
+   final static int AXE = 0;
+   final static int KEY = 1;
 
    final static int MAX_SEARCH = 500;
    final static int MAX_EXPLORATION= 500;
@@ -54,6 +56,10 @@ public class Agent {
    private boolean have_key            = false;
    private boolean have_gold           = false;
    private int     num_dynamites_held  = 0;
+
+   private boolean[] inventory = new boolean[2];
+   inventory[0] = false;
+   inventory[1] = false;
 
    private boolean game_won  = false;
    private boolean game_lost = false;
@@ -241,8 +247,10 @@ public class Agent {
          Point axe, gold, key;
          Vector<Point> dynamite;
          axe = map.getAxe();
+         if (axe != null) inventory[AXE] = true;
          gold = map.getGold();
          key = map.getKey();
+         if (key != null) inventory[KEY] = true;
          dynamite = map.getDynamite();
 
          // First try for gold then axes then keys
@@ -329,10 +337,10 @@ public class Agent {
       while (!points.isEmpty()) {
          // given vector is actually in reverse
          nextPoint = points.poll();
-         System.out.println("Point to add = [" + nextPoint.row + "," +
-               nextPoint.col + "]");
-         System.out.println("Value of point to add: '" +
-               map.getTileWithLocation(nextPoint).value + "'");
+         // System.out.println("Point to add = [" + nextPoint.row + "," +
+         //       nextPoint.col + "]");
+         // System.out.println("Value of point to add: '" +
+         //       map.getTileWithLocation(nextPoint).value + "'");
          dRow = nextPoint.row - previousPoint.row;
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
@@ -356,14 +364,6 @@ public class Agent {
             }
 
             while( nextDirection != currentDirection) {
-
-               /*if (currentDirection < nextDirection) {
-                  list.add('L');
-                  currentDirection = (currentDirection + 1) % 4;
-               } else {
-                  list.add('R');
-                  currentDirection = (currentDirection - 1) % 4;
-               }*/
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             } //If we come up to a door we open it

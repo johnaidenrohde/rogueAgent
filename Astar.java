@@ -88,7 +88,7 @@ public class Astar
                //The total length of the path to each neighbor node
                cost = curr.g + manDistance(curr, neighbor);
                //Remove this neighbor because the current path is better
-               if((openSet.contains(neighbor))&&(cost < neighbor.g)){
+               if((openSet.contains(neighbor)&&(cost < neighbor.g))){
                   openSet.remove(neighbor);
                }
                if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
@@ -100,8 +100,6 @@ public class Astar
                   neighbor.setF(manDistance(neighbor, goal) + cost);
                   neighbor.setParent(curr);
                   openSet.add(neighbor);
-                  //System.out.println ("Added Neighbor " + i  + neighbor.row + ","
-                    //    + neighbor.col);
                }
             }
          }
