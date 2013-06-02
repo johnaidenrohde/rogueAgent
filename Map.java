@@ -31,6 +31,7 @@ public class Map {
 
     public boolean pointsInit = false;
     private PriorityQueue<Point> pointsToDynamite;
+    public LinkedList<Point> hasBeenDynamited;
 
     public Map (int rows, int cols, char initialValue) {
         numRows = rows;
@@ -179,7 +180,7 @@ public class Map {
             return true;
         }else if( tile == 'X' && unknownOff ){
             return false;
-        } else if (pointsToDynamite.contains(p)) {
+        } else if (pointsToDynamite != null && pointsToDynamite.contains(p)) {
             return true;
         } else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
             return false;
@@ -258,6 +259,7 @@ public class Map {
             Comparator<Point> comp = new PointComparator();
             pointsToDynamite = new PriorityQueue<Point>(100, comp);
         }
+        hasBeenDynamited = new LinkedList<Point>();
 
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
@@ -277,6 +279,7 @@ public class Map {
     public Point dynamite() {
         // find dynamitable things radiating out from gold (if exists).
         Point next = pointsToDynamite.poll();
+        hasBeenDynamited.add(next);
         return next;
     }
 
