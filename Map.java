@@ -27,6 +27,7 @@ public class Map {
     private boolean doorsOpen = false;
     private boolean treesDown = false;
     private boolean unknownOff = false;
+    private boolean learntSomething = false;
 
     private PriorityQueue<Point> pointsToDynamite;
     public LinkedList<Point> hasBeenDynamited = new LinkedList<Point>();
@@ -118,6 +119,9 @@ public class Map {
                     case 'a':
                     axe = new Point (r,c,'a');
                     break;
+                }
+                if (map[r][c] == 'X') {
+                    learntSomething = true;
                 }
                 map[r][c] = view[2+i][2+j];
             }
@@ -289,6 +293,10 @@ public class Map {
         if(gold != null) {
             p.setF(Astar.manDistance(p, gold));
         }
+    }
+
+    public boolean learntSomething() {
+        return learntSomething;
     }
 
     public Vector<Point> findGroupsX (Point currPoint) {

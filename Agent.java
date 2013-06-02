@@ -77,6 +77,8 @@ public class Agent {
 
    private int     numTurns  = 0;
    private int     numWalking= 0;
+   private int     numNothing= 0;
+   private boolean learntSomething = false;
 
    //This is each tile we will want to use dynamite on
    private LinkedList<Point> toDynamite;
@@ -176,8 +178,20 @@ public class Agent {
     */
    private char walk() {
       
-      if (numTurns == 0) {
-         return 'R';
+      // if (numTurns == 0) {
+      //    return 'R';
+      // }
+
+      learntSomething = map.learntSomething();
+
+      if (!learntSomething) {
+         numNothing++;
+      } else {
+         numNothing = 0;
+      }
+      if (!learntSomething && numNothing > 50) {
+         System.out.println("Didn't learn anything");
+         firstRun = true;
       }
 
       if (firstRun && map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
@@ -195,7 +209,7 @@ public class Agent {
          Point adjacent = map.getTileInDirection(getDirectionFromTurn('L'), currPoint);
          Point next = map.getTileInDirection(dirn, currPoint);
          if (map.isWalkable(adjacent)) {
-            // turn)towards and advance.
+            // turn towards and advance.
             willAdvance = true;
             return 'L';
          }
