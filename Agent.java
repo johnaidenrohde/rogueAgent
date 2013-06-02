@@ -61,6 +61,8 @@ public class Agent {
    private int     numTurns  = 0;
    private int     numWalking= 0;
 
+   //This is each tile we will want to use dynamite on
+   private Vector<Point> toDynamite;
 
 /*******************************************************************************
  * MAIN AI FUCNTION *
@@ -242,46 +244,27 @@ public class Agent {
             map.makeWalkable('T');
          }
 
-
-         ///PUT IN A FUNCTION
-
-         // Find the location of all essential pieces on board:
-         Point axe, gold, key;
-         Vector<Point> dynamite;
-         axe = map.getAxe();
-         gold = map.getGold();
-         key = map.getKey();
-         dynamite = map.getDynamite();
-
-         // First try for gold then axes then keys
-         if (gold != null) {
-            result = tryGet(gold, map);
-            if( result != PROMPT_USER){
-               System.out.println("Found path to gold!!!!");
-               return result;
-            }
+         ///Try to grab any and all useful stuff
+         result = collectGoodies();
+         if(result != '?'){
+            return result;
          }
 
-         if( !have_axe && axe != null){
-            result = tryGet(axe, map);
-            if( result != PROMPT_USER){
-               System.out.println("Found a path to axe");
-               return result;
+         //Tentative Dynamite function only supports one stick at the moment
+         /*
+         if( num_dynamites_held > 0 ){
+            //This calls a function that dynamites an item on the map
+            Point mightDynamite = map.dynamite;
+            while(  != null){
+               result = collectGoodies();
+               if(result != '?'){
+                  toDynamite.add(mightDynamite);
+                  return result;
+               }
+               mightDynamite = map.dynamite;
             }
-         }
-         if( !have_key && key != null){
-            result = tryGet(key, map);
-            if( result != PROMPT_USER){
-               System.out.println("Found a path to key");
-               return result;
-            }
-         }
-         //Tentative Dynamite function
-         /* If we have dynamite
-          *    while( map.dynamite != null){
-          *       toDynamite = map.dynamite
-          *       if(
-            */
+         }*/
+
          //The system has found nothing to do, so get the trees!
          Vector<Point> burnEverything = map.getTrees(currPoint);
          int numTrees = burnEverything.size();
@@ -289,12 +272,13 @@ public class Agent {
             result = tryGet(burnEverything.get(i), map);
             return result;
          }
-         // I bet there's more exploring to do...
+         // Now I bet there's more exploring to do...
          missionStep = WALKING;
          firstRun = true;
          numWalking = 0;
          firstRun = true;
 
+         //Now we really have nothing to do
          return('?');
       }else if(!walkDone){ // We still have unexplored regions, so we explore them
          System.out.println("Still exploring");
@@ -306,15 +290,12 @@ public class Agent {
             //Chart a path to the group of X's
             result = tryGet(x.get(i), map);
             if(result != PROMPT_USER){ // If you can reach the group
-               System.out.println("Made it with instruction " + result);
                return(result);
             }
-            System.out.println("No path to that one");
          }
          // If there is no group of Xs we can reach
          System.out.println("Done Exploring");
          walkDone = true;
-         //map.makeWalkable('X');
       }
       // Place holder move
       return('?');
@@ -344,6 +325,56 @@ public class Agent {
       }
 
    }
+
+   /* Attempt to collect all the important pieces
+    *
+    * @return the first move or a X if no moves can be found
+    */
+   private char collectGoodies(){
+      // Find the location of all essential pieces on board:
+      char result;
+      Point axe, gold, key;
+      Vector<Point> dynamite;
+      axe = map.getAxe();
+      gold = map.getGold();
+      key = map.getKey();
+      dynamite = map.getDynamite();
+
+      // First try for gold then axes then keys
+      if (gold != null) {
+         result = tryGet(gold, map);
+         if( result != PROMPT_USER){
+            System.out.println("Found path to gold!!!!");
+            return result;
+         }
+      }
+      if( !have_axe && axe != null){
+         result = tryGet(axe, map);
+         if( result != PROMPT_USER){
+            System.out.println("Found a path to axe");
+            return result;
+         }
+      }
+      if( !have_key && key != null){
+         result = tryGet(key, map);
+         if( result != PROMPT_USER){
+            System.out.println("Found a path to key");
+            return result;
+         }
+      }
+      if( (num_dynamites_held < dynamite.size()) && dynamite != null){
+         for(int i = 0; i < dynamite.size(); i++){
+            result = tryGet(key, map);
+            if( result != PROMPT_USER){
+               System.out.println("Found a path to key");
+               return result;
+            }
+         }
+      }
+      return('?');
+   }
+
+
    /* translate a vector of points into a list of moves
     *
     * */
@@ -356,21 +387,11 @@ public class Agent {
       int nextDirection = NORTH;
       int dRow, dCol;
       int currentDirection = dirn;
-
       previousPoint = currPoint;
-      System.out.println("currPoint = [" + currPoint.row + "," +
-               currPoint.col + "]");
-      System.out.println("Current Direction: " + currentDirection);
+
       while (!points.isEmpty()) {
          // given vector is actually in reverse
          nextPoint = points.poll();
-         System.out.println("Point to add = [" + nextPoint.row + "," +
-               nextPoint.col + "]");
-         System.out.println("Value of point to add: '" +
-               map.getTileWithLocation(nextPoint).value + "'");
-         //if(map.getTileWithLocation(nextPoint).value == 'X'){
-           // return list;
-         //}
          dRow = nextPoint.row - previousPoint.row;
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
@@ -380,7 +401,7 @@ public class Agent {
                   + nextPoint.col + "]");
             previousPoint = nextPoint;
          }else{
-            // Seems to work better
+            // Find the next direction
             if (nextPoint.row == previousPoint.row - 1) {
                nextDirection = NORTH;
             } else if (nextPoint.row == previousPoint.row + 1) {
@@ -392,22 +413,30 @@ public class Agent {
                   nextDirection = WEST;
                }
             }
-
+            //Turn in that direction
             while( nextDirection != currentDirection) {
 
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
+            }
+
+            //Work out how to go forward
+            Point toEnter = map.getTileInDirection(currentDirection, currPoint);
+            //If the point was on our list to dynamite we blow it up
+            if( toDynamite.contains(toEnter)){
+               list.add('D');
+               list.add('F');
             } //If we come up to a door we open it
-            if (map.getTileInDirection(currentDirection, currPoint).value
+            else if (map.getTileInDirection(currentDirection, currPoint).value
                   == '-' && have_key) {
                list.add('O');
                list.add('F');
-            } //And chop down any trees
+            } // Chop down any trees we come to
             else if (map.getTileInDirection(currentDirection, currPoint).value
                   == 'T' && have_axe) {
                list.add('C');
                list.add('F');
-            } //Otherwise we continue on our merry way
+            }  //Otherwise we continue on our merry way
             else {
                list.add('F');
             }
@@ -530,6 +559,9 @@ public class Agent {
       //Initialize boths maps
       map = new Map(200,200,Map.UNVISITED);
       map.updateMap(view, currPoint);
+
+      //and the list of places to dynamite
+      toDynamite = null;
    }
 
    public static void main( String[] args ){
