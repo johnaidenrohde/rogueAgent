@@ -244,15 +244,16 @@ public class Agent {
             map.makeWalkable('T');
          }
 
-         ///Try to grab any and all useful stuff
+         //Try to grab any and all useful stuff
          result = collectGoodies();
          if(result != '?'){
             return result;
          }
 
-
+         // If we can't get to any we blow stuff up
          if( num_dynamites_held > 0 ){
             //This calls a function that dynamites an item on the map
+            map.refreshDynamite();
             Point mightDynamite = map.dynamite();
             while(  mightDynamite != null){
                result = collectGoodies();
