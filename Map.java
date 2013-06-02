@@ -123,7 +123,7 @@ public class Map {
                 map[r][c] = view[2+i][2+j];
             }
         }
-        printMap(currPoint);
+        // printMap(currPoint);
     }
 
     public Point getTileInDirection(int direction, Point currPoint) {
@@ -138,19 +138,19 @@ public class Map {
             d_col =  1; break;
             case WEST:
             d_col = -1; break;
-            case NORTH_EAST:
-            d_row = -1;
-            d_col = 1;
-            break;
-            case NORTH_WEST:
-            d_row = -1;
-            d_col = -1; break;
-            case SOUTH_EAST:
-            d_row = 1;
-            d_col = 1; break;
-            case SOUTH_WEST:
-            d_row = 1;
-            d_col = -1; break;
+            // case NORTH_EAST:
+            // d_row = -1;
+            // d_col = 1;
+            // break;
+            // case NORTH_WEST:
+            // d_row = -1;
+            // d_col = -1; break;
+            // case SOUTH_EAST:
+            // d_row = 1;
+            // d_col = 1; break;
+            // case SOUTH_WEST:
+            // d_row = 1;
+            // d_col = -1; break;
         }
         new_row = currPoint.row + d_row;
         new_col = currPoint.col + d_col;
