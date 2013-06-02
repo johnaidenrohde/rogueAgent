@@ -282,6 +282,17 @@ public class Agent {
           *       toDynamite = map.dynamite
           *       if(
             */
+
+         if (num_dynamites_held > 0) {
+            if (!map.pointsInit) {
+               map.refreshDynamite();
+            }
+            Point nextDynamite = map.dynamite();
+            while (nextDynamite != null) {
+               System.out.println("Dynamite! Dist from gold: " + nextDynamite.f);
+               nextDynamite = map.dynamite();
+            }
+         }
          //The system has found nothing to do, so get the trees!
          Vector<Point> burnEverything = map.getTrees(currPoint);
          int numTrees = burnEverything.size();
