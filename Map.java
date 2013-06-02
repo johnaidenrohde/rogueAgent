@@ -86,7 +86,7 @@ public class Map {
 		System.out.println("\n");
       // Fiddle with these for different maps
 		for( r=75; r < 125; r++ ) {
-			System.out.print( (r-0) + " ");
+			System.out.print( (r-0) + "\t");
       // Fiddle with these for different maps
 			for( c=50; c < 140; c++ ) {
 	            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
