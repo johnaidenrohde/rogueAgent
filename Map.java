@@ -195,7 +195,7 @@ public class Map {
          return(true);
       }else if( tile == '-' && doorsOpen ){
          return true;
-      }else if( tile == '*' || tile == '~' ){
+      }else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
          return false;
       }
       //Otherwise
