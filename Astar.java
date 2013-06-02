@@ -39,7 +39,7 @@ public class Astar
 
       //Setup the openSet
       Comparator<Point> comparator = new PointComparator();
-      openSet  = new PriorityQueue<Point>(640, comparator);
+      openSet  = new PriorityQueue<Point>(6400, comparator);
 
       //Setup closed set
       closedSet = new ArrayList<Point>(6400);
@@ -59,26 +59,29 @@ public class Astar
       System.out.println ("Start point " + start.row + ","
                       + start.col + " " + start.value);
 
-
-
-
       while( openSet.size() != 0 && iterations < MAX_ITERATIONS  ){
-         // System.out.println("Iteration: " + iterations);
-          iterations++;
+         if( iterations == (MAX_ITERATIONS - 1)){
+            System.out.println("Failed due to iterations");
+            System.out.println("Open set contains " + openSet.size());
+         }
+         iterations++;
 
          curr = openSet.poll();
          //View the progression of the search
          //map.rewrite(curr, '@');
          //map.printMap( curr );
-
+         openSet.remove(neighbor);
          //If we have arrived at the goal
          if((curr.row == goal.row) && (curr.col == goal.col)){
             return tracePath(curr);
          }
          //If we find more unexplored territory we can acess we go there instead
          if(curr.value == 'X'){
+            System.out.println ("New goal " + curr.row + ","
+                      + curr.col + " " + curr.value);
             return tracePath(curr);
          }
+
          closedSet.add(curr);
          //For each neighbor node
          for(int i = 0; i < 4; i = i + 1){
@@ -91,9 +94,9 @@ public class Astar
                if((openSet.contains(neighbor))&&(cost < neighbor.g)){
                   openSet.remove(neighbor);
                }
-               if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
-                  closedSet.remove(neighbor);
-               }
+               //if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
+                 // closedSet.remove(neighbor);
+               //}
                //If we haven't considered this square it yet
                if(!(closedSet.contains(neighbor))&& !(openSet.contains(neighbor))){
                   neighbor.setG(cost);

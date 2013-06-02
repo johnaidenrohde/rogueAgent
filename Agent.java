@@ -23,8 +23,8 @@ public class Agent {
    final static char PROMPT_USER = 'X';
    final static char WALK_DONE = 'D';
 
-   final static int MAX_SEARCH = 500;
-   final static int MAX_EXPLORATION= 500;
+   final static int MAX_SEARCH = 10000;
+   final static int MAX_EXPLORATION= 250;
 
 
    private Map     map;
@@ -259,12 +259,14 @@ public class Agent {
             }
          }
          if( !have_key ){
-               result = tryGet(key, planMap);
+            result = tryGet(key, planMap);
             if( result != PROMPT_USER){
                System.out.println("Found a path to key");
                return result;
             }
          }
+         //The system has found nothing to do
+         return('X');
       }else if(!walkDone){ // We still have unexplored regions, so we explore them
          System.out.println("Still exploring");
          Vector<Point> path;
