@@ -282,9 +282,10 @@ public class Agent {
          }
          // I bet there's more exploring to do...
          missionStep = WALKING;
+         firstRun = true;
          numWalking = 0;
 
-         return('X');
+         return('?');
       }else if(!walkDone){ // We still have unexplored regions, so we explore them
          System.out.println("Still exploring");
          Vector<Point> path;
@@ -326,7 +327,7 @@ public class Agent {
          // Return the first step on our triumphant journey
          if (mission == null || mission.size() == 0) {
             return PROMPT_USER;
-         } 
+         }
          return mission.poll();
       } else {
          return PROMPT_USER;
