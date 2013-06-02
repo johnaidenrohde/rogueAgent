@@ -24,7 +24,7 @@ public class Agent {
    final static char WALK_DONE = 'D';
 
    final static int MAX_SEARCH = 10000;
-   final static int MAX_EXPLORATION= 250;
+   final static int MAX_EXPLORATION= 1000;
 
 
    private Map     map;
@@ -418,10 +418,11 @@ public class Agent {
       // make changes to direction only if dir'n changed
       if (( action == 'L' )||( action == 'l' )) {
          dirn = ( dirn + 1 ) % 4;
-
+         currPoint.dirn = dirn;
          return( true );
       } else if (( action == 'R' )||( action == 'r' )) {
          dirn = ( dirn + 3 ) % 4;
+         currPoint.dirn = dirn;
          return( true );
       } else {
          // if direction not changed, look ahead 1 space to see what's there
