@@ -53,21 +53,30 @@ public class Astar
       openSet.add(curr);
       int iterations = 1;
 
+      //What am I searching for
+      System.out.println ("Goal point " + goal.row + ","
+                      + goal.col + " " + goal.value);
+      System.out.println ("Start point " + start.row + ","
+                      + start.col + " " + start.value);
+
+
+
 
       while( openSet.size() != 0 && iterations < MAX_ITERATIONS  ){
          // System.out.println("Iteration: " + iterations);
           iterations++;
 
          curr = openSet.poll();
-         //System.out.println ("Considering point " + curr.row + ","
-           //           + curr.col);
-
          //View the progression of the search
          //map.rewrite(curr, '@');
          //map.printMap( curr );
 
          //If we have arrived at the goal
          if((curr.row == goal.row) && (curr.col == goal.col)){
+            return tracePath(curr);
+         }
+         //If we find more unexplored territory we can acess we go there instead
+         if(curr.value == 'X'){
             return tracePath(curr);
          }
          closedSet.add(curr);
@@ -111,8 +120,8 @@ public class Astar
    private static Vector<Point> tracePath( Point toFollow  ){
       Vector<Point> toReturn = new Vector<Point>(640);
       while(toFollow.parent != null){
-        System.out.println("Tracepath: "+ toFollow.row + ","
-                                + toFollow.col);
+        //System.out.println("Tracepath: "+ toFollow.row + ","
+          //                      + toFollow.col);
          toReturn.add(toFollow);
          toFollow = toFollow.parent;
       }

@@ -24,6 +24,8 @@ public class Agent {
    final static char WALK_DONE = 'D';
 
    final static int MAX_SEARCH = 500;
+   final static int MAX_EXPLORATION= 500;
+
 
    private Map     map;
 
@@ -70,7 +72,7 @@ public class Agent {
       char action = PROMPT_USER;
 
       //intially explore the map for 200 turns
-      if(numTurns < 200){
+      if(numTurns < MAX_EXPLORATION){
          action = walk();
       }else{
          //Then work out what strategy we want to take
@@ -203,6 +205,7 @@ public class Agent {
                // A* out of sync with world, for example an obstacle has
                // been revealed where there used to be an X. Try again.
                System.out.println("A* out of sync");
+               mission.clear();
                onMission = false;
             } else {
                return(mission.poll());
@@ -217,7 +220,8 @@ public class Agent {
          //map and modify it. Since we are garuanteed a solution this map
          //doesn't need to be updated
          planMap = new Map(map);
-
+         System.out.println("Got to the planning stage");
+         planMap.printMap(currPoint);
          // Presumably if we have the gold we have a clear path to get back
          // so we can use the regular map
          if (have_gold) {
@@ -247,18 +251,21 @@ public class Agent {
             System.out.println("Found path to gold!!!!");
             return result;
          }
-         result = tryGet(axe, planMap);
-         if( !have_axe && result != PROMPT_USER){
-            System.out.println("Found a path to axe");
-            return result;
+         if( !have_axe ){
+            result = tryGet(axe, planMap);
+            if( result != PROMPT_USER){
+               System.out.println("Found a path to axe");
+               return result;
+            }
          }
-         result = tryGet(key, planMap);
-         if( !have_key && result != PROMPT_USER){
-            System.out.println("Found a path to key");
-            return result;
+         if( !have_key ){
+               result = tryGet(key, planMap);
+            if( result != PROMPT_USER){
+               System.out.println("Found a path to key");
+               return result;
+            }
          }
-
-      }else{ // We still have unexplored regions, so we explore them
+      }else if(!walkDone){ // We still have unexplored regions, so we explore them
          System.out.println("Still exploring");
          Vector<Point> path;
          Vector<Point> x = map.findGroupsX(currPoint);
@@ -268,14 +275,14 @@ public class Agent {
             //Chart a path to the group of X's
             result = tryGet(x.get(i), map);
             if(result != PROMPT_USER){ // If you can reach the group
-               System.out.println("Made it with instruction" + mission.peek());
+               System.out.println("Made it with instruction " + result);
                return(result);
             }
             System.out.println("No path to that one");
          }
          // If there is no group of Xs we can reach
          System.out.println("Done Exploring");
-            walkDone = true;
+         walkDone = true;
       }
       // Place holder move
       return('?');
