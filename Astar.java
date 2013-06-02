@@ -134,22 +134,6 @@ public class Astar
     * @return distance from currPos to goal
     */
    public static int manDistance(Point curr, Point goal){
-<<<<<<< HEAD
-=======
-      if (curr == null || goal == null) {
-        System.out.println("Considering a null point");
-        try {
-          System.out.println("Curr: " + curr.row + " ," + curr.col);
-        } catch (Exception e) {
-          System.out.println("Curr");
-        }
-        try {
-          System.out.println("Goal :" + goal.row + " ," + goal.col);
-        } catch (Exception e) {
-          System.out.println("Goal");
-        }
-      }
->>>>>>> 896a8fe4f19624cc84b94a833d642519520f8355
       int r, c;
       r = Math.abs(curr.row - goal.row);
       c = Math.abs(curr.col - goal.col);
