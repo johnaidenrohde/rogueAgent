@@ -47,6 +47,9 @@ public class Astar
       curr = start;
 
       // Add the start node to the open set
+      if (goal == null || curr == null) {
+              System.out.println("Null goal : curr=" + curr.row +", "+curr.col);
+      }
       curr.setParent(null);
       curr.setF(manDistance(curr, goal));
       curr.setG(0);
@@ -66,6 +69,10 @@ public class Astar
             System.out.println("Open set contains " + openSet.size());
          }
          iterations++;
+         // print progress
+      map.rewrite(curr, '@');
+      map.printMap(curr);
+
 
          curr = openSet.poll();
 
@@ -78,6 +85,7 @@ public class Astar
          //For each neighbor node
          for(int i = 0; i < 4; i = i + 1){
             neighbor = map.getTileInDirection(i, curr);
+          
             // We only consider walkable nodes
             if(map.astarIsWalkable(neighbor)){
                //The total length of the path to each neighbor node
@@ -126,6 +134,19 @@ public class Astar
     * @return distance from currPos to goal
     */
    public static int manDistance(Point curr, Point goal){
+      if (curr == null || goal == null) {
+        System.out.println("Considering a null point");
+        try {
+          System.out.println("Curr: " + curr.row + " ," + curr.col);
+        } catch (Exception e) {
+          System.out.println("Curr");
+        }
+        try {
+          System.out.println("Goal :" + goal.row + " ," + goal.col);
+        } catch (Exception e) {
+          System.out.println("Goal");
+        }
+      }
       int r, c;
       r = Math.abs(curr.row - goal.row);
       c = Math.abs(curr.col - goal.col);

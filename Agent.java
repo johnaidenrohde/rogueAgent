@@ -24,7 +24,7 @@ public class Agent {
    final static char WALK_DONE = 'D';
 
    final static int MAX_SEARCH = 10000;
-   final static int MAX_EXPLORATION= 1000;
+   final static int MAX_EXPLORATION= 250;
 
 
    private Map     map;
@@ -236,19 +236,22 @@ public class Agent {
          dynamite = map.getDynamite();
 
          // First try for gold then axes then keys
-         result = tryGet(gold, map);
-         if( result != PROMPT_USER){
-            System.out.println("Found path to gold!!!!");
-            return result;
+         if (gold != null) {
+            result = tryGet(gold, map);
+            if( result != PROMPT_USER){
+               System.out.println("Found path to gold!!!!");
+               return result;
+            }
          }
-         if( !have_axe ){
+
+         if( !have_axe && axe != null){
             result = tryGet(axe, map);
             if( result != PROMPT_USER){
                System.out.println("Found a path to axe");
                return result;
             }
          }
-         if( !have_key ){
+         if( !have_key && key != null){
             result = tryGet(key, map);
             if( result != PROMPT_USER){
                System.out.println("Found a path to key");
@@ -296,6 +299,9 @@ public class Agent {
          System.out.println("Path found = " + mission.toString());
          onMission = true;
          // Return the first step on our triumphant journey
+         if (mission == null || mission.size() == 0) {
+            return PROMPT_USER;
+         } 
          return mission.poll();
       } else {
          return PROMPT_USER;
