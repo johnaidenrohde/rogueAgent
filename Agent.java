@@ -275,6 +275,7 @@ public class Agent {
          // If there is no group of Xs we can reach
          System.out.println("Done Exploring");
          walkDone = true;
+         map.makeWalkable('X');
       }
       // Place holder move
       return('?');
@@ -325,9 +326,9 @@ public class Agent {
                nextPoint.col + "]");
          System.out.println("Value of point to add: '" +
                map.getTileWithLocation(nextPoint).value + "'");
-         if(map.getTileWithLocation(nextPoint).value == 'X'){
-            return list;
-         }
+         //if(map.getTileWithLocation(nextPoint).value == 'X'){
+           // return list;
+         //}
          dRow = nextPoint.row - previousPoint.row;
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent

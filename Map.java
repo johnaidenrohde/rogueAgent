@@ -27,6 +27,7 @@ public class Map {
 
    private boolean doorsOpen = false;
    private boolean treesDown = false;
+   private boolean unknownOff = false;
 
 	public Map (int rows, int cols, char initialValue) {
 		numRows = rows;
@@ -195,6 +196,8 @@ public class Map {
          return(true);
       }else if( tile == '-' && doorsOpen ){
          return true;
+      }else if( tile == 'X' && unknownOff ){
+         return false;
       }else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
          return false;
       }
@@ -207,6 +210,8 @@ public class Map {
          doorsOpen = true;
       }else if(c == 'T'){
          treesDown = true;
+      }else if(c == 'X'){
+         unknownOff = true;
       }
    }
 
