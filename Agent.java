@@ -62,7 +62,7 @@ public class Agent {
    private int     numWalking= 0;
 
    //This is each tile we will want to use dynamite on
-   private Vector<Point> toDynamite;
+   private LinkedList<Point> toDynamite;
 
 /*******************************************************************************
  * MAIN AI FUCNTION *
@@ -250,19 +250,19 @@ public class Agent {
             return result;
          }
 
-         /*
+
          if( num_dynamites_held > 0 ){
             //This calls a function that dynamites an item on the map
-            Point mightDynamite = map.dynamite;
-            while(  != null){
+            Point mightDynamite = map.dynamite();
+            while(  mightDynamite != null){
                result = collectGoodies();
                if(result != '?'){
                   toDynamite.add(mightDynamite);
                   return result;
                }
-               mightDynamite = map.dynamite;
+               mightDynamite = map.dynamite();
             }
-         }*/
+         }
 
 
 
@@ -426,7 +426,7 @@ public class Agent {
             }
 
             //Work out how to go forward
-            Point toEnter = map.getTileInDirection(currentDirection, currPoint);
+            Point toEnter =  map.getTileInDirection(currentDirection, currPoint);
             //If the point was on our list to dynamite we blow it up
             if( toDynamite.contains(toEnter)){
                list.add('D');
@@ -566,7 +566,7 @@ public class Agent {
       map.updateMap(view, currPoint);
 
       //and the list of places to dynamite
-      toDynamite = null;
+      toDynamite = new LinkedList<Point>();
    }
 
    public static void main( String[] args ){
