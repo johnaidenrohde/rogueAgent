@@ -89,7 +89,7 @@ public class Map {
 		for( r=75; r < 125; r++ ) {
 			System.out.print( (r-0) + "\t");
       // Fiddle with these for different maps
-			for( c=50; c < 200; c++ ) {
+			for( c=50; c < 150; c++ ) {
 	            if(( r == currPoint.row )&&( c == currPoint.col )) { // agent is here
 	            	switch( currPoint.dirn ) {
 	            		case NORTH: ch = '^'; break;

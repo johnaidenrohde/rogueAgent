@@ -79,7 +79,7 @@ public class Agent {
          action = gamePlan();
       }
 
-      if (numWalking > MAX_EXPLORATION) {
+      if (numWalking >= MAX_EXPLORATION) {
          missionStep = PATHFINDING;
       }
 
@@ -284,6 +284,7 @@ public class Agent {
          missionStep = WALKING;
          firstRun = true;
          numWalking = 0;
+         firstRun = true;
 
          return('?');
       }else if(!walkDone){ // We still have unexplored regions, so we explore them
