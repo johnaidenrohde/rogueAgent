@@ -19,7 +19,6 @@ public class Map {
     public char[][] map;
     public int numRows, numCols;
 
-
     private Point   axe = null;
     private Point   key = null;
     private Point   gold = null;
@@ -29,8 +28,8 @@ public class Map {
     private boolean treesDown = false;
     private boolean unknownOff = false;
 
-    public boolean pointsInit = false;
-    private PriorityQueue<Point> points;
+    private PriorityQueue<Point> pointsToDynamite;
+    public LinkedList<Point> hasBeenDynamited;
 
     public Map (int rows, int cols, char initialValue) {
         numRows = rows;
@@ -179,7 +178,9 @@ public class Map {
             return true;
         }else if( tile == 'X' && unknownOff ){
             return false;
-        }else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
+        } else if (pointsToDynamite != null && pointsToDynamite.contains(p)) {
+            return true;
+        } else if( tile == '*' || tile == '~' || tile == 'T' || tile == '-'){
             return false;
         }
       //Otherwise
@@ -250,12 +251,13 @@ public class Map {
     public void refreshDynamite() {
         if (gold == null) {
             // points go into queue in arbitrary order
-            points = new PriorityQueue<Point>();
+            pointsToDynamite = new PriorityQueue<Point>();
         } else {
             // points ordered by man distance
             Comparator<Point> comp = new PointComparator();
-            points = new PriorityQueue<Point>(100, comp);
+            pointsToDynamite = new PriorityQueue<Point>(100, comp);
         }
+        hasBeenDynamited = new LinkedList<Point>();
 
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
@@ -263,18 +265,22 @@ public class Map {
                     // it's dynamitable! add to queue.
                     Point p = new Point(i,j,map[i][j]);
                     findGoldDistance(p);
-                    if (!points.contains(p)){ 
-                        points.add(p);
+                    if (!pointsToDynamite.contains(p)){
+                        pointsToDynamite.add(p);
                     }
                 }
             }
         }
-        pointsInit = true;
     }
 
     public Point dynamite() {
+        // Ignore the last dynamited point if there is one
+         if(!hasBeenDynamited.isEmpty()){
+            hasBeenDynamited.remove();
+         }
         // find dynamitable things radiating out from gold (if exists).
-        Point next = points.poll();
+        Point next = pointsToDynamite.poll();
+        hasBeenDynamited.add(next);
         return next;
     }
 
@@ -353,7 +359,7 @@ public class Map {
                     map[i][j] = ' ';
                 }
             }
-        }   
+        }
     }
 
     public void setTile(Point location) {
