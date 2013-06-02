@@ -275,7 +275,7 @@ public class Agent {
          // If there is no group of Xs we can reach
          System.out.println("Done Exploring");
          walkDone = true;
-         map.makeWalkable('X');
+         //map.makeWalkable('X');
       }
       // Place holder move
       return('?');
