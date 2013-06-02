@@ -305,6 +305,19 @@ public class Map {
 		return x;
 	}
 
+	public Vector<Point> getTrees (Point currPoint) {
+		Vector <Point> x = new Vector<Point>();
+		for (int i = 0; i < numCols; i++) {
+			for (int j = 0; j < numRows; j++) {
+				if (map[i][j] == 'T') {
+					Point p = new Point(i, j);
+					x.add(p);
+				}
+			}
+		}
+		return x;
+	}
+
    public void rewrite(Point p, char toWrite){
       map[p.row][p.col] = toWrite;
    }

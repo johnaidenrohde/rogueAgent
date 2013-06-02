@@ -70,8 +70,8 @@ public class Astar
          }
          iterations++;
          // print progress
-      map.rewrite(curr, '@');
-      map.printMap(curr);
+      //map.rewrite(curr, '@');
+      //map.printMap(curr);
 
 
          curr = openSet.poll();

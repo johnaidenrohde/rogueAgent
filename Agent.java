@@ -24,8 +24,11 @@ public class Agent {
    final static char WALK_DONE = 'D';
 
    final static int MAX_SEARCH = 10000;
-   final static int MAX_EXPLORATION= 250;
+   final static int MAX_EXPLORATION = 250;
 
+   final static int WALKING = 0;
+   final static int X_HUNT = 1;
+   final static int PATHFINDING = 2;
 
    private Map     map;
 
@@ -56,6 +59,7 @@ public class Agent {
    private boolean game_lost = false;
 
    private int     numTurns  = 0;
+   private int     numWalking= 0;
 
 
 /*******************************************************************************
@@ -68,13 +72,24 @@ public class Agent {
       int ch=0;
       char action = PROMPT_USER;
 
-      //intially explore the map for 200 turns
-      if(numTurns < MAX_EXPLORATION){
+      if (missionStep == WALKING) {
          action = walk();
-      }else{
-         //Then work out what strategy we want to take
+         numWalking++;
+      } else if (missionStep == X_HUNT || missionStep == PATHFINDING) {
          action = gamePlan();
       }
+
+      if (numWalking > MAX_EXPLORATION) {
+         missionStep = PATHFINDING;
+      }
+
+      // //intially explore the map for 200 turns
+      // if(numTurns < MAX_EXPLORATION){
+      //    action = walk();
+      // }else{
+      //    //Then work out what strategy we want to take
+      //    action = gamePlan();
+      // }
 
       //Otherwise prompt for input
       if (action == PROMPT_USER) {
@@ -258,7 +273,17 @@ public class Agent {
                return result;
             }
          }
-         //The system has found nothing to do
+         //The system has found nothing to do, so get the trees!
+         Vector<Point> burnEverything = map.getTrees(currPoint);
+         int numTrees = burnEverything.size();
+         for (int i = 0; i < numTrees; i++) {
+            result = tryGet(burnEverything.get(i), map);
+            return result;
+         }
+         // I bet there's more exploring to do...
+         missionStep = WALKING;
+         numWalking = 0;
+
          return('X');
       }else if(!walkDone){ // We still have unexplored regions, so we explore them
          System.out.println("Still exploring");
