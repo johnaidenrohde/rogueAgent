@@ -83,54 +83,62 @@ public class Agent {
          missionStep = PATHFINDING;
       }
 
-      // //Otherwise prompt for input
-      // if (action == PROMPT_USER) {
-      //    // THE FOLLOWING FOR DEBUGGING ONLY:
-      //    if (numTurns > MAX_SEARCH) {
-      //       System.out.println("Max search moves exceeded!");
-      //    } else {
-      //       System.out.println("Walk completed! Found:");
-      //    }
-      //    Point axe, gold, key;
-      //    Vector<Point> dynamite;
-      //    axe = map.getAxe();
-      //    gold = map.getGold();
-      //    key = map.getKey();
-      //    dynamite = map.getDynamite();
-
-      //    if (axe != null) {
-      //       System.out.println("Axe at row:" + axe.row + " col:" + axe.col);
-      //    }
-      //    if (gold !=null) {
-      //       System.out.println("Gold at row:" + gold.row + " col:" + gold.col);
-
-      //    }
-      //    if (key != null) {
-      //       System.out.println("Key at row:" + key.row + " col:" + key.col);
-      //    }
-      //    if (dynamite != null) {
-      //       System.out.println("Last dynamite at row:" + dynamite.lastElement().row + " col:" + dynamite.lastElement().col);
-      //    }
-      //    // END DEBUGGING
-
-      //    System.out.print("Enter Action(s): ");
-      //    try {
-      //       while ( ch != -1 ) {
-      //          // read character from keyboard
-      //          ch  = System.in.read();
-
-      //          switch( ch ) { // if character is a valid action, return it
-      //             case 'F': case 'L': case 'R': case 'C': case 'O': case 'B':
-      //             case 'f': case 'l': case 'r': case 'c': case 'o': case 'b':
-      //             action = (char) ch;
-      //          }
-      //       }
-      //    }
-
-      //    catch (IOException e) {
-      //       System.out.println ("IO error:" + e );
-      //    }
+      // //intially explore the map for 200 turns
+      // if(numTurns < MAX_EXPLORATION){
+      //    action = walk();
+      // }else{
+      //    //Then work out what strategy we want to take
+      //    action = gamePlan();
       // }
+
+      //Otherwise prompt for input
+      if (action == PROMPT_USER) {
+         // THE FOLLOWING FOR DEBUGGING ONLY:
+         if (numTurns > MAX_SEARCH) {
+            System.out.println("Max search moves exceeded!");
+         } else {
+            System.out.println("Walk completed! Found:");
+         }
+         Point axe, gold, key;
+         Vector<Point> dynamite;
+         axe = map.getAxe();
+         gold = map.getGold();
+         key = map.getKey();
+         dynamite = map.getDynamite();
+
+         if (axe != null) {
+            System.out.println("Axe at row:" + axe.row + " col:" + axe.col);
+         }
+         if (gold !=null) {
+            System.out.println("Gold at row:" + gold.row + " col:" + gold.col);
+
+         }
+         if (key != null) {
+            System.out.println("Key at row:" + key.row + " col:" + key.col);
+         }
+         if (dynamite != null) {
+            System.out.println("Last dynamite at row:" + dynamite.lastElement().row + " col:" + dynamite.lastElement().col);
+         }
+         // END DEBUGGING
+
+         System.out.print("Enter Action(s): ");
+         try {
+            while ( ch != -1 ) {
+               // read character from keyboard
+               ch  = System.in.read();
+
+               switch( ch ) { // if character is a valid action, return it
+                  case 'F': case 'L': case 'R': case 'C': case 'O': case 'B':
+                  case 'f': case 'l': case 'r': case 'c': case 'o': case 'b':
+                  action = (char) ch;
+               }
+            }
+         }
+
+         catch (IOException e) {
+            System.out.println ("IO error:" + e );
+         }
+      }
       numTurns = numTurns + 1;
       return action;
    }
@@ -203,12 +211,12 @@ public class Agent {
       //if we are currently walking a path just return the next character
       if(onMission){
          if(!mission.isEmpty()){
-            // System.out.println("Current mission = " + mission.toString());
+            System.out.println("Current mission = " + mission.toString());
             if (mission.peek() == 'F' &&
                   !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
                // A* out of sync with world, for example an obstacle has
                // been revealed where there used to be an X. Try again.
-               // System.out.println("A* out of sync");
+               System.out.println("A* out of sync");
                mission.clear();
                onMission = false;
             } else {
@@ -220,7 +228,7 @@ public class Agent {
       }
       // We need a new mission
       if (walkDone) { //Main game plan
-         // System.out.println("Got to the planning stage");
+         System.out.println("Got to the planning stage");
          if (have_gold) {
             Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, map);
             mission = getMoves(pathBack);
@@ -249,7 +257,7 @@ public class Agent {
          if (gold != null) {
             result = tryGet(gold, map);
             if( result != PROMPT_USER){
-               // System.out.println("Found path to gold!!!!");
+               System.out.println("Found path to gold!!!!");
                return result;
             }
          }
@@ -257,14 +265,14 @@ public class Agent {
          if( !have_axe && axe != null){
             result = tryGet(axe, map);
             if( result != PROMPT_USER){
-               // System.out.println("Found a path to axe");
+               System.out.println("Found a path to axe");
                return result;
             }
          }
          if( !have_key && key != null){
             result = tryGet(key, map);
             if( result != PROMPT_USER){
-               // System.out.println("Found a path to key");
+               System.out.println("Found a path to key");
                return result;
             }
          }
@@ -300,22 +308,22 @@ public class Agent {
 
          return('?');
       }else if(!walkDone){ // We still have unexplored regions, so we explore them
-         // System.out.println("Still exploring");
+         System.out.println("Still exploring");
          Vector<Point> path;
          Vector<Point> x = map.findGroupsX(currPoint);
          int size = x.size();
          for (int i = 0; i < x.size(); i++) {
-            // System.out.println("X group has " + x.size());
+            System.out.println("X group has " + x.size());
             //Chart a path to the group of X's
             result = tryGet(x.get(i), map);
             if(result != PROMPT_USER){ // If you can reach the group
-               // System.out.println("Made it with instruction " + result);
+               System.out.println("Made it with instruction " + result);
                return(result);
             }
-            // System.out.println("No path to that one");
+            System.out.println("No path to that one");
          }
          // If there is no group of Xs we can reach
-         // System.out.println("Done Exploring");
+         System.out.println("Done Exploring");
          walkDone = true;
          //map.makeWalkable('X');
       }
@@ -335,7 +343,7 @@ public class Agent {
       if (path != null) {
          // Find a path to what you want
          mission = getMoves(path);
-         // System.out.println("Path found = " + mission.toString());
+         System.out.println("Path found = " + mission.toString());
          onMission = true;
          // Return the first step on our triumphant journey
          if (mission == null || mission.size() == 0) {
@@ -361,16 +369,16 @@ public class Agent {
       int currentDirection = dirn;
 
       previousPoint = currPoint;
-      // System.out.println("currPoint = [" + currPoint.row + "," +
-      //          currPoint.col + "]");
-      // System.out.println("Current Direction: " + currentDirection);
+      System.out.println("currPoint = [" + currPoint.row + "," +
+               currPoint.col + "]");
+      System.out.println("Current Direction: " + currentDirection);
       while (!points.isEmpty()) {
          // given vector is actually in reverse
          nextPoint = points.poll();
-         // System.out.println("Point to add = [" + nextPoint.row + "," +
-         //       nextPoint.col + "]");
-         // System.out.println("Value of point to add: '" +
-               // map.getTileWithLocation(nextPoint).value + "'");
+         System.out.println("Point to add = [" + nextPoint.row + "," +
+               nextPoint.col + "]");
+         System.out.println("Value of point to add: '" +
+               map.getTileWithLocation(nextPoint).value + "'");
          //if(map.getTileWithLocation(nextPoint).value == 'X'){
            // return list;
          //}
@@ -378,9 +386,9 @@ public class Agent {
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
          if(Math.abs(dRow + dCol) != 1){
-            // System.out.println("Something fishy going on here");
-            // System.out.println("Problem point to add = [" + nextPoint.row + ","
-            //       + nextPoint.col + "]");
+            System.out.println("Something fishy going on here");
+            System.out.println("Problem point to add = [" + nextPoint.row + ","
+                  + nextPoint.col + "]");
             previousPoint = nextPoint;
          }else{
             // Seems to work better
@@ -581,7 +589,7 @@ public class Agent {
             agent.update_world( action, view ); //Update the map and other things
             //agent.print_view( view ); // COMMENT THIS OUT BEFORE SUBMISSION
             action = agent.get_action(view);
-            // System.out.println("Making move: " + action);
+            System.out.println("Making move: " + action);
             out.write( action );
          }
       }

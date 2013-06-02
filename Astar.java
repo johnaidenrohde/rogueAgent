@@ -48,7 +48,7 @@ public class Astar
 
       // Add the start node to the open set
       if (goal == null || curr == null) {
-              // System.out.println("Null goal : curr=" + curr.row +", "+curr.col);
+              System.out.println("Null goal : curr=" + curr.row +", "+curr.col);
       }
       curr.setParent(null);
       curr.setF(manDistance(curr, goal));
@@ -57,10 +57,10 @@ public class Astar
       int iterations = 1;
 
       //What am I searching for
-      // System.out.println ("Goal point " + goal.row + ","
-      //                 + goal.col + " " + goal.value);
-      // System.out.println ("Start point " + start.row + ","
-      //                 + start.col + " " + start.value);
+      System.out.println ("Goal point " + goal.row + ","
+                      + goal.col + " " + goal.value);
+      System.out.println ("Start point " + start.row + ","
+                      + start.col + " " + start.value);
 
       while( openSet.size() != 0 && iterations < MAX_ITERATIONS  ){
 
@@ -108,7 +108,7 @@ public class Astar
          }
       }
       //If no path was found
-      // System.out.println ("Error: No Path Found");
+      System.out.println ("Error: No Path Found");
       return null;
 
    }
@@ -135,17 +135,17 @@ public class Astar
     */
    public static int manDistance(Point curr, Point goal){
       if (curr == null || goal == null) {
-        // System.out.println("Considering a null point");
-        // try {
-        //   System.out.println("Curr: " + curr.row + " ," + curr.col);
-        // } catch (Exception e) {
-        //   System.out.println("Curr");
-        // }
-        // try {
-        //   System.out.println("Goal :" + goal.row + " ," + goal.col);
-        // } catch (Exception e) {
-        //   System.out.println("Goal");
-        // }
+        System.out.println("Considering a null point");
+        try {
+          System.out.println("Curr: " + curr.row + " ," + curr.col);
+        } catch (Exception e) {
+          System.out.println("Curr");
+        }
+        try {
+          System.out.println("Goal :" + goal.row + " ," + goal.col);
+        } catch (Exception e) {
+          System.out.println("Goal");
+        }
       }
       int r, c;
       r = Math.abs(curr.row - goal.row);
