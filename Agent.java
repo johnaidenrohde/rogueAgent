@@ -242,6 +242,9 @@ public class Agent {
             map.makeWalkable('T');
          }
 
+
+         ///PUT IN A FUNCTION
+
          // Find the location of all essential pieces on board:
          Point axe, gold, key;
          Vector<Point> dynamite;
@@ -273,6 +276,12 @@ public class Agent {
                return result;
             }
          }
+         //Tentative Dynamite function
+         /* If we have dynamite
+          *    while( map.dynamite != null){
+          *       toDynamite = map.dynamite
+          *       if(
+            */
          //The system has found nothing to do, so get the trees!
          Vector<Point> burnEverything = map.getTrees(currPoint);
          int numTrees = burnEverything.size();
