@@ -7,6 +7,23 @@
  *  UNSW Session 1, 2013                     *
  *********************************************/
 
+/******************************************************************************
+ * How it works:                                                              *
+ * We start by exploring the map using a technique called left-hand           *
+ * wallfollowing, where the agent sticks to the left wall and explores as much*
+ * as possible while remembering everything it sees.                          *
+ * It then seeks out any regions of the map left unexplored (marked with an X)*
+ * and attempts to explore them. This pathfinding is accomplished with A*, as *
+ * it seemed the easiest and most reliable form of searching.                 *
+ * It then sees what it can do - if there's an unobstructed path to any item, *
+ * it takes it (with gold being highest priority). Otherwise, it tries to used*
+ * any items it already has to win the game.                                  *
+ *                                                                            *
+ *                                                                            *
+ *****************************************************************************/
+
+
+
 
 import java.util.*;
 import java.lang.*;
@@ -84,6 +101,10 @@ public class Agent {
       if (numWalking >= MAX_EXPLORATION) {
          missionStep = PATHFINDING;
       }
+      // if (numTurns < 1000 && missionStep != WALKING) {
+      //    firstRun = true;
+      //    missionStep = WALKING;
+      // }
 
       // //intially explore the map for 200 turns
       // if(numTurns < MAX_EXPLORATION){
@@ -154,6 +175,11 @@ public class Agent {
     * Then turn and continue straight.
     */
    private char walk() {
+      
+      if (numTurns == 0) {
+         return 'R';
+      }
+
       if (firstRun && map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
          return 'F';
       }
@@ -365,11 +391,11 @@ public class Agent {
             return result;
          }
       }
-      if( (num_dynamites_held < dynamite.size()) && dynamite != null){
+      if( dynamite != null && (num_dynamites_held < dynamite.size()) ){
          for(int i = 0; i < dynamite.size(); i++){
-            result = tryGet(key, map);
+            result = tryGet(dynamite.firstElement(), map);
             if( result != PROMPT_USER){
-               System.out.println("Found a path to key");
+               System.out.println("Found a path to dynamite");
                return result;
             }
          }

@@ -258,7 +258,7 @@ public class Map {
             pointsToDynamite = new PriorityQueue<Point>(100, comp);
         }
         hasBeenDynamited.clear();
-
+        unknownOff = true;
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
                 if (map[i][j] == 'T' || map[i][j] == '*') {
