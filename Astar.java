@@ -54,9 +54,9 @@ public class Astar
       int iterations = 1;
 
 
-      while( openSet.size() != 0 ){
+      while( openSet.size() != 0 && iterations < MAX_ITERATIONS  ){
          // System.out.println("Iteration: " + iterations);
-         // iterations++;
+          iterations++;
 
          curr = openSet.poll();
          //System.out.println ("Considering point " + curr.row + ","
@@ -64,7 +64,7 @@ public class Astar
 
          //View the progression of the search
          //map.rewrite(curr, '@');
-         //map.printMap( start );
+         //map.printMap( curr );
 
          //If we have arrived at the goal
          if((curr.row == goal.row) && (curr.col == goal.col)){
@@ -77,7 +77,7 @@ public class Astar
             // We only consider walkable nodes
             if(map.isWalkable(neighbor)){
                //The total length of the path to each neighbor node
-               cost = curr.g + 1;
+               cost = curr.g + manDistance(curr, neighbor);
                //Remove this neighbor because the current path is better
                if((openSet.contains(neighbor))&&(cost < neighbor.g)){
                   openSet.remove(neighbor);

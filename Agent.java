@@ -197,6 +197,7 @@ public class Agent {
       //if we are currently walking a path just return the next character
       if(onMission){
          if(!mission.isEmpty()){
+            System.out.println("Current mission = " + mission.toString());
             if (mission.peek() == 'F' &&
                   !map.isWalkable(map.getTileInDirection(dirn, currPoint))) {
                // A* out of sync with world, for example an obstacle has
@@ -243,18 +244,22 @@ public class Agent {
          // First try for gold then axes then keys
          result = tryGet(gold, planMap);
          if( result != PROMPT_USER){
+            System.out.println("Found path to gold!!!!");
             return result;
          }
          result = tryGet(axe, planMap);
          if( !have_axe && result != PROMPT_USER){
+            System.out.println("Found a path to axe");
             return result;
          }
          result = tryGet(key, planMap);
          if( !have_key && result != PROMPT_USER){
+            System.out.println("Found a path to key");
             return result;
          }
 
       }else{ // We still have unexplored regions, so we explore them
+         System.out.println("Still exploring");
          Vector<Point> path;
          Vector<Point> x = map.findGroupsX(currPoint);
          int size = x.size();
@@ -272,9 +277,8 @@ public class Agent {
          System.out.println("Done Exploring");
             walkDone = true;
       }
-
       // Place holder move
-      return('R');
+      return('?');
    }
 
    /* Try to get the given goal node
