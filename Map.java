@@ -16,7 +16,7 @@ public class Map {
    	final static int NORTH_WEST = 7;
 
 
-	private char[][] map;
+	public char[][] map;
 	public int numRows, numCols;
 
 
@@ -24,6 +24,9 @@ public class Map {
 	private Point   key = null;
 	private Point   gold = null;
 	private Vector<Point> dynamite = new Vector<Point>();
+
+   private boolean doorsOpen = false;
+   private boolean treesDown = false;
 
 	public Map (int rows, int cols, char initialValue) {
 		numRows = rows;
@@ -41,7 +44,7 @@ public class Map {
 		numRows = rows;
 		numCols = cols;
 		// initialise to blank char
-		map = new char[rows][cols];
+		this.map = new char[rows][cols];
 		int i, j;
 		for (i = 0; i < rows; i++) {
 			for (j = 0; j < cols; j++) {
@@ -52,9 +55,16 @@ public class Map {
 /*
  * Copy constructor
  *
- */
+ *
    public Map(Map another) {
-      this.map = another.map;
+      // initialise to blank char
+		this.map = new char[another.numRows][numCols];
+		int i, j;
+		for (i = 0; i < another.numRows; i++) {
+			for (j = 0; j < another.numCols; j++) {
+				map[i][j] = another.map[i][j];
+			}
+		}
 	   this.numRows = another.numRows;
       this.numCols = another.numRows;
       this.axe = another.axe;
@@ -62,7 +72,7 @@ public class Map {
 	   this.gold =  another.gold;
 	   this.dynamite = another.dynamite;
    }
-
+*/
 
 /*******************************************************************************
  * USEFUL FUNCTIONS *
@@ -178,7 +188,27 @@ public class Map {
       }
    }
 
+   //A dependent path checking function for a star
+   public boolean astarIsWalkable(Point p) {
+      char tile = p.value;
+      if( tile == 'T' && treesDown){
+         return(true);
+      }else if( tile == '-' && doorsOpen ){
+         return true;
+      }else if( tile == '*' || tile == '~' ){
+         return false;
+      }
+      //Otherwise
+      return true;
+   }
 
+   public void makeWalkable(char c){
+      if(c == '-'){
+         doorsOpen = true;
+      }else if(c == 'T'){
+         treesDown = true;
+      }
+   }
 
 	public boolean isAdjacentTo(Point p, Point curr) {
 		int dRow, dCol;
@@ -270,7 +300,6 @@ public class Map {
 		return x;
 	}
 
-   //Nasty hacky function used only for debugging
    public void rewrite(Point p, char toWrite){
       map[p.row][p.col] = toWrite;
    }

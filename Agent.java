@@ -29,9 +29,6 @@ public class Agent {
 
    private Map     map;
 
-   //Used in path planning
-   private Map     planMap;
-
    // initial row and column
    private Point   startPoint;
 
@@ -216,14 +213,7 @@ public class Agent {
       }
       // We need a new mission
       if (walkDone) { //Main game plan
-         //Every time we start a new mission plan we get ourselves a planning
-         //map and modify it. Since we are garuanteed a solution this map
-         //doesn't need to be updated
-         planMap = new Map(map);
          System.out.println("Got to the planning stage");
-         planMap.printMap(currPoint);
-         // Presumably if we have the gold we have a clear path to get back
-         // so we can use the regular map
          if (have_gold) {
             Vector<Point> pathBack = Astar.findPath(currPoint, startPoint, map);
             mission = getMoves(pathBack);
@@ -231,10 +221,10 @@ public class Agent {
             return mission.poll();
          }if (have_key) {
             // all doors considered opened, change isWalkable
-            planMap.removeAllItems('-');
+            map.makeWalkable('-');
          }if (have_axe){
             // all trees can be removed from the map.
-            planMap.removeAllItems('T');
+            map.makeWalkable('T');
          }
 
          // Find the location of all essential pieces on board:
@@ -246,20 +236,20 @@ public class Agent {
          dynamite = map.getDynamite();
 
          // First try for gold then axes then keys
-         result = tryGet(gold, planMap);
+         result = tryGet(gold, map);
          if( result != PROMPT_USER){
             System.out.println("Found path to gold!!!!");
             return result;
          }
          if( !have_axe ){
-            result = tryGet(axe, planMap);
+            result = tryGet(axe, map);
             if( result != PROMPT_USER){
                System.out.println("Found a path to axe");
                return result;
             }
          }
          if( !have_key ){
-            result = tryGet(key, planMap);
+            result = tryGet(key, map);
             if( result != PROMPT_USER){
                System.out.println("Found a path to key");
                return result;
@@ -295,10 +285,10 @@ public class Agent {
     * @param goal: Where you want to go, map: What you can see
     * @return Set the mission and return the first charater or PROMPT_USER
     * */
-   private char tryGet( Point goal, Map planMap ){
+   private char tryGet( Point goal, Map map ){
       //Can we get the gold from where we are standing
       Vector<Point> path;
-      path = Astar.findPath(currPoint, goal, planMap);
+      path = Astar.findPath(currPoint, goal, map);
       if (path != null) {
          // Find a path to what you want
          mission = getMoves(path);
@@ -335,6 +325,9 @@ public class Agent {
                nextPoint.col + "]");
          System.out.println("Value of point to add: '" +
                map.getTileWithLocation(nextPoint).value + "'");
+         if(map.getTileWithLocation(nextPoint).value == 'X'){
+            return list;
+         }
          dRow = nextPoint.row - previousPoint.row;
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
@@ -359,13 +352,6 @@ public class Agent {
 
             while( nextDirection != currentDirection) {
 
-               /*if (currentDirection < nextDirection) {
-                  list.add('L');
-                  currentDirection = (currentDirection + 1) % 4;
-               } else {
-                  list.add('R');
-                  currentDirection = (currentDirection - 1) % 4;
-               }*/
                list.add('L');
                currentDirection = (currentDirection + 1) % 4;
             } //If we come up to a door we open it

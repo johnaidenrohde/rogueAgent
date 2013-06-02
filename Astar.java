@@ -60,6 +60,7 @@ public class Astar
                       + start.col + " " + start.value);
 
       while( openSet.size() != 0 && iterations < MAX_ITERATIONS  ){
+
          if( iterations == (MAX_ITERATIONS - 1)){
             System.out.println("Failed due to iterations");
             System.out.println("Open set contains " + openSet.size());
@@ -67,18 +68,9 @@ public class Astar
          iterations++;
 
          curr = openSet.poll();
-         //View the progression of the search
-         //map.rewrite(curr, '@');
-         //map.printMap( curr );
-         openSet.remove(neighbor);
+
          //If we have arrived at the goal
          if((curr.row == goal.row) && (curr.col == goal.col)){
-            return tracePath(curr);
-         }
-         //If we find more unexplored territory we can acess we go there instead
-         if(curr.value == 'X'){
-            System.out.println ("New goal " + curr.row + ","
-                      + curr.col + " " + curr.value);
             return tracePath(curr);
          }
 
@@ -87,24 +79,22 @@ public class Astar
          for(int i = 0; i < 4; i = i + 1){
             neighbor = map.getTileInDirection(i, curr);
             // We only consider walkable nodes
-            if(map.isWalkable(neighbor)){
+            if(map.astarIsWalkable(neighbor)){
                //The total length of the path to each neighbor node
                cost = curr.g + manDistance(curr, neighbor);
                //Remove this neighbor because the current path is better
                if((openSet.contains(neighbor))&&(cost < neighbor.g)){
                   openSet.remove(neighbor);
                }
-               //if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
-                 // closedSet.remove(neighbor);
-               //}
+               if((closedSet.contains(neighbor))&&(cost < neighbor.g)){
+                  closedSet.remove(neighbor);
+               }
                //If we haven't considered this square it yet
                if(!(closedSet.contains(neighbor))&& !(openSet.contains(neighbor))){
                   neighbor.setG(cost);
                   neighbor.setF(manDistance(neighbor, goal) + cost);
                   neighbor.setParent(curr);
                   openSet.add(neighbor);
-                  //System.out.println ("Added Neighbor " + i  + neighbor.row + ","
-                    //    + neighbor.col);
                }
             }
          }
