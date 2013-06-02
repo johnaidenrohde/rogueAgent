@@ -244,6 +244,7 @@ public class Agent {
             map.makeWalkable('T');
          }
 
+<<<<<<< HEAD
          ///Try to grab any and all useful stuff
          result = collectGoodies();
          if(result != '?'){
@@ -265,6 +266,59 @@ public class Agent {
             }
          }*/
 
+=======
+
+         ///PUT IN A FUNCTION
+
+         // Find the location of all essential pieces on board:
+         Point axe, gold, key;
+         Vector<Point> dynamite;
+         axe = map.getAxe();
+         gold = map.getGold();
+         key = map.getKey();
+         dynamite = map.getDynamite();
+
+         // First try for gold then axes then keys
+         if (gold != null) {
+            result = tryGet(gold, map);
+            if( result != PROMPT_USER){
+               System.out.println("Found path to gold!!!!");
+               return result;
+            }
+         }
+
+         if( !have_axe && axe != null){
+            result = tryGet(axe, map);
+            if( result != PROMPT_USER){
+               System.out.println("Found a path to axe");
+               return result;
+            }
+         }
+         if( !have_key && key != null){
+            result = tryGet(key, map);
+            if( result != PROMPT_USER){
+               System.out.println("Found a path to key");
+               return result;
+            }
+         }
+         //Tentative Dynamite function
+         /* If we have dynamite
+          *    while( map.dynamite != null){
+          *       toDynamite = map.dynamite
+          *       if(
+            */
+
+         if (num_dynamites_held > 0) {
+            if (!map.pointsInit) {
+               map.refreshDynamite();
+            }
+            Point nextDynamite = map.dynamite();
+            while (nextDynamite != null) {
+               System.out.println("Dynamite! Dist from gold: " + nextDynamite.f);
+               nextDynamite = map.dynamite();
+            }
+         }
+>>>>>>> 896a8fe4f19624cc84b94a833d642519520f8355
          //The system has found nothing to do, so get the trees!
          Vector<Point> burnEverything = map.getTrees(currPoint);
          int numTrees = burnEverything.size();
@@ -290,8 +344,22 @@ public class Agent {
             //Chart a path to the group of X's
             result = tryGet(x.get(i), map);
             if(result != PROMPT_USER){ // If you can reach the group
+<<<<<<< HEAD
+<<<<<<< HEAD
                return(result);
             }
+=======
+               // System.out.println("Made it with instruction " + result);
+               return(result);
+            }
+            // System.out.println("No path to that one");
+>>>>>>> 896a8fe4f19624cc84b94a833d642519520f8355
+=======
+               System.out.println("Made it with instruction " + result);
+               return(result);
+            }
+            System.out.println("No path to that one");
+>>>>>>> 9732e50f21bd0c04753c1d141ff3cb3ba656f342
          }
          // If there is no group of Xs we can reach
          System.out.println("Done Exploring");
@@ -388,10 +456,32 @@ public class Agent {
       int dRow, dCol;
       int currentDirection = dirn;
       previousPoint = currPoint;
+<<<<<<< HEAD
+<<<<<<< HEAD
 
       while (!points.isEmpty()) {
          // given vector is actually in reverse
          nextPoint = points.poll();
+=======
+      // System.out.println("currPoint = [" + currPoint.row + "," +
+      //          currPoint.col + "]");
+      // System.out.println("Current Direction: " + currentDirection);
+=======
+      System.out.println("currPoint = [" + currPoint.row + "," +
+               currPoint.col + "]");
+      System.out.println("Current Direction: " + currentDirection);
+>>>>>>> 9732e50f21bd0c04753c1d141ff3cb3ba656f342
+      while (!points.isEmpty()) {
+         // given vector is actually in reverse
+         nextPoint = points.poll();
+         System.out.println("Point to add = [" + nextPoint.row + "," +
+               nextPoint.col + "]");
+         System.out.println("Value of point to add: '" +
+               map.getTileWithLocation(nextPoint).value + "'");
+         //if(map.getTileWithLocation(nextPoint).value == 'X'){
+           // return list;
+         //}
+>>>>>>> 896a8fe4f19624cc84b94a833d642519520f8355
          dRow = nextPoint.row - previousPoint.row;
          dCol = nextPoint.col - previousPoint.col;
          // check that the square is adjacent
